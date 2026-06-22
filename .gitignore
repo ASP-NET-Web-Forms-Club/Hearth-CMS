@@ -1,0 +1,33 @@
+# === Hearth CMS — runtime & generated ===
+/src/hearthcms/App_Data/page_cache/
+/src/hearthcms/App_Data/*.sqlite
+cms.sqlite
+/src/hearthcms/media/
+
+# === Build output ===
+[Bb]in/
+[Oo]bj/
+
+# === Visual Studio ===
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# === NuGet (you use packages.config) ===
+/src/packages/          
+*.nupkg
+# keep packages.config tracked
+
+# === Logs / temp ===
+*.log
+*.tmp
+[Tt]emp/
+_ReSharper*/
+*.cache
+
+# === OS cruft ===
+Thumbs.db
+desktop.ini
+.DS_Store

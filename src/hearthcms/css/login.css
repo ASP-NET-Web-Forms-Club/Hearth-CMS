@@ -1,0 +1,85 @@
+﻿/* Login screen - sits on top of site.css */
+.page-login {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    background:
+        radial-gradient(circle at 20% 10%, #e0e7ff 0%, transparent 40%),
+        radial-gradient(circle at 80% 90%, #fef3c7 0%, transparent 45%),
+        #fafafa;
+    padding: 24px;
+}
+.login-shell { width: 100%; max-width: 420px; }
+.login-card {
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 18px;
+    padding: 36px 32px;
+    box-shadow: 0 30px 80px -20px rgba(0,0,0,.16), 0 1px 2px rgba(0,0,0,.04);
+}
+.login-brand {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-weight: 700; font-size: 15px;
+    margin-bottom: 24px;
+    color: #18181b;
+}
+.login-brand i { color: #2563eb; font-size: 16px; }
+.login-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 8px;
+    letter-spacing: -0.025em;
+    color: #18181b;
+}
+.login-sub { color: #525252; font-size: 15px; margin: 0 0 26px; }
+.login-flash {
+    background: #f5f5f4;
+    color: #525252;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    margin-bottom: 18px;
+}
+.login-error {
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    margin-bottom: 14px;
+}
+.login-meta { text-align: center; font-size: 13px; margin: 22px 0 0; }
+.login-meta a { color: #525252; }
+.login-meta a:hover { color: #18181b; }
+
+.login-card .form-field { margin-bottom: 14px; }
+.login-card label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: #18181b;
+}
+.login-card input[type=text],
+.login-card input[type=password] {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 14.5px;
+    border: 1px solid #d4d4d4;
+    border-radius: 8px;
+    background: #fff;
+    font-family: inherit;
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+.login-card input:focus {
+    outline: none;
+    border-color: #18181b;
+    box-shadow: 0 0 0 3px rgba(0,0,0,.06);
+}
+.login-card .btn-primary { height: 46px; margin-top: 8px; }
+
+
+.login-card .form-field-inline { display: flex; align-items: center; }
+.login-card .remember-label { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: #525252; cursor: pointer; user-select: none; }
+.login-card .remember-label input[type=checkbox] { width: 16px; height: 16px; margin: 0; accent-color: #18181b; cursor: pointer; }

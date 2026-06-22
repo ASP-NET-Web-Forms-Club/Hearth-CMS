@@ -1,0 +1,44 @@
+﻿# Hearth CMS - app-level config (file overrides)
+#
+# To activate: copy or rename this file to "config.txt" in the same folder
+# (/App_Data/config.txt), edit the value, then open /reset_app in your browser
+# to load it without restarting the app.
+#
+# Lines starting with # or ; are comments. Format is key=value.
+#
+# ------------------------------------------------------------------
+# admin_url - the first path segment of the admin panel.
+#
+#   admin_url=admin     ->  panel at /admin/...        (the default)
+#   admin_url=backend   ->  panel at /backend/...
+#   admin_url=manage    ->  panel at /manage/...
+#
+# When this line is present it ALWAYS wins over the value saved in
+# Settings, and the Settings field becomes read-only. This is the
+# recovery hatch: if you forget a custom admin URL, set it here and
+# visit /reset_app.
+#
+# The admin slug root is also the login screen - there is no separate
+# /login page. Visit the slug while signed out to sign in.
+#
+# Allowed: letters, numbers, hyphen, underscore. Reserved words
+# (blog, logout, api, category, reset_app, home, ...) are rejected.
+# ------------------------------------------------------------------
+
+admin_url=admin
+
+# ==================================================================
+# Forgotten admin username / password?
+#
+# This is handled by a SEPARATE one-shot file, NOT by config.txt.
+#
+# Create /App_Data/reset_admin.txt with these two lines:
+#
+#   admin_username=youradmin
+#   admin_password=your-new-password
+#
+# Then restart the app, or visit /reset_app. The admin login is reset
+# to those values and the file is automatically consumed (deleted, or
+# blanked if it can't be deleted) so the password never lingers on disk.
+# After signing in you can change the password again in the admin panel.
+# ==================================================================

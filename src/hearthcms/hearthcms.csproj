@@ -1,0 +1,622 @@
+﻿<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{7A9009B8-74D2-41C9-8218-ADDE25B75EF8}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>System</RootNamespace>
+    <AssemblyName>hearthcms</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <UseIISExpress>true</UseIISExpress>
+    <Use64BitIISExpress />
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <UseGlobalApplicationHostFile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.SQLite, Version=1.0.119.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.119.0\lib\net46\System.Data.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="App_Data\themes\Almanac\404.html" />
+    <Content Include="App_Data\themes\Almanac\article-full-width.html" />
+    <Content Include="App_Data\themes\Almanac\article-sidebar.html" />
+    <Content Include="App_Data\themes\Almanac\categories-latest-post.html" />
+    <Content Include="App_Data\themes\Almanac\category.html" />
+    <Content Include="App_Data\themes\Almanac\components\cat-mini-item.html" />
+    <Content Include="App_Data\themes\Almanac\components\category-section.html" />
+    <Content Include="App_Data\themes\Almanac\components\cover-image.html" />
+    <Content Include="App_Data\themes\Almanac\components\footer-column.html" />
+    <Content Include="App_Data\themes\Almanac\components\post-card.html" />
+    <Content Include="App_Data\themes\Almanac\components\row-post.html" />
+    <Content Include="App_Data\themes\Almanac\components\section-latest-posts.html" />
+    <Content Include="App_Data\themes\Almanac\config.txt" />
+    <Content Include="App_Data\themes\Almanac\home.html" />
+    <Content Include="App_Data\themes\Almanac\latest-post.html" />
+    <Content Include="App_Data\themes\Almanac\_layout.html" />
+    <Content Include="App_Data\themes\Cathode\404.html" />
+    <Content Include="App_Data\themes\Cathode\article-full-width.html" />
+    <Content Include="App_Data\themes\Cathode\article-sidebar.html" />
+    <Content Include="App_Data\themes\Cathode\categories-latest-post.html" />
+    <Content Include="App_Data\themes\Cathode\category.html" />
+    <Content Include="App_Data\themes\Cathode\components\cat-mini-item.html" />
+    <Content Include="App_Data\themes\Cathode\components\category-section.html" />
+    <Content Include="App_Data\themes\Cathode\components\cover-image.html" />
+    <Content Include="App_Data\themes\Cathode\components\footer-column.html" />
+    <Content Include="App_Data\themes\Cathode\components\post-card.html" />
+    <Content Include="App_Data\themes\Cathode\components\row-post.html" />
+    <Content Include="App_Data\themes\Cathode\components\section-latest-posts.html" />
+    <Content Include="App_Data\themes\Cathode\config.txt" />
+    <Content Include="App_Data\themes\Cathode\home.html" />
+    <Content Include="App_Data\themes\Cathode\latest-post.html" />
+    <Content Include="App_Data\themes\Cathode\_layout.html" />
+    <Content Include="App_Data\themes\Cipher\404.html" />
+    <Content Include="App_Data\themes\Cipher\article-full-width.html" />
+    <Content Include="App_Data\themes\Cipher\article-sidebar.html" />
+    <Content Include="App_Data\themes\Cipher\categories-latest-post.html" />
+    <Content Include="App_Data\themes\Cipher\category.html" />
+    <Content Include="App_Data\themes\Cipher\components\cat-mini-item.html" />
+    <Content Include="App_Data\themes\Cipher\components\category-section.html" />
+    <Content Include="App_Data\themes\Cipher\components\cover-image.html" />
+    <Content Include="App_Data\themes\Cipher\components\footer-column.html" />
+    <Content Include="App_Data\themes\Cipher\components\post-card.html" />
+    <Content Include="App_Data\themes\Cipher\components\row-post.html" />
+    <Content Include="App_Data\themes\Cipher\components\section-latest-posts.html" />
+    <Content Include="App_Data\themes\Cipher\config.txt" />
+    <Content Include="App_Data\themes\Cipher\home.html" />
+    <Content Include="App_Data\themes\Cipher\latest-post.html" />
+    <Content Include="App_Data\themes\Cipher\_layout.html" />
+    <Content Include="App_Data\themes\Corporate\404.html" />
+    <Content Include="App_Data\themes\Corporate\article-full-width.html" />
+    <Content Include="App_Data\themes\Corporate\article-sidebar.html" />
+    <Content Include="App_Data\themes\Corporate\categories-latest-post.html" />
+    <Content Include="App_Data\themes\Corporate\category.html" />
+    <Content Include="App_Data\themes\Corporate\components\cat-mini-item.html" />
+    <Content Include="App_Data\themes\Corporate\components\category-section.html" />
+    <Content Include="App_Data\themes\Corporate\components\cover-image.html" />
+    <Content Include="App_Data\themes\Corporate\components\footer-column.html" />
+    <Content Include="App_Data\themes\Corporate\components\post-card.html" />
+    <Content Include="App_Data\themes\Corporate\components\row-post.html" />
+    <Content Include="App_Data\themes\Corporate\components\section-latest-posts.html" />
+    <Content Include="App_Data\themes\Corporate\config.txt" />
+    <Content Include="App_Data\themes\Corporate\home.html" />
+    <Content Include="App_Data\themes\Corporate\latest-post.html" />
+    <Content Include="App_Data\themes\Corporate\_layout.html" />
+    <Content Include="App_Data\themes\DivingDark\404.html" />
+    <Content Include="App_Data\themes\DivingDark\article-full-width.html" />
+    <Content Include="App_Data\themes\DivingDark\article-sidebar.html" />
+    <Content Include="App_Data\themes\DivingDark\categories-latest-post.html" />
+    <Content Include="App_Data\themes\DivingDark\category.html" />
+    <Content Include="App_Data\themes\DivingDark\components\cat-mini-item.html" />
+    <Content Include="App_Data\themes\DivingDark\components\category-section.html" />
+    <Content Include="App_Data\themes\DivingDark\components\cover-image.html" />
+    <Content Include="App_Data\themes\DivingDark\components\footer-column.html" />
+    <Content Include="App_Data\themes\DivingDark\components\post-card.html" />
+    <Content Include="App_Data\themes\DivingDark\components\row-post.html" />
+    <Content Include="App_Data\themes\DivingDark\components\section-latest-posts.html" />
+    <Content Include="App_Data\themes\DivingDark\config.txt" />
+    <Content Include="App_Data\themes\DivingDark\home.html" />
+    <Content Include="App_Data\themes\DivingDark\latest-post.html" />
+    <Content Include="App_Data\themes\DivingDark\_layout.html" />
+    <Content Include="App_Data\themes\Diving\404.html" />
+    <Content Include="App_Data\themes\Diving\article-full-width.html" />
+    <Content Include="App_Data\themes\Diving\article-sidebar.html" />
+    <Content Include="App_Data\themes\Diving\categories-latest-post.html" />
+    <Content Include="App_Data\themes\Diving\category.html" />
+    <Content Include="App_Data\themes\Diving\components\cat-mini-item.html" />
+    <Content Include="App_Data\themes\Diving\components\category-section.html" />
+    <Content Include="App_Data\themes\Diving\components\cover-image.html" />
+    <Content Include="App_Data\themes\Diving\components\footer-column.html" />
+    <Content Include="App_Data\themes\Diving\components\post-card.html" />
+    <Content Include="App_Data\themes\Diving\components\row-post.html" />
+    <Content Include="App_Data\themes\Diving\components\section-latest-posts.html" />
+    <Content Include="App_Data\themes\Diving\config.txt" />
+    <Content Include="App_Data\themes\Diving\home.html" />
+    <Content Include="App_Data\themes\Diving\latest-post.html" />
+    <Content Include="App_Data\themes\Diving\_layout.html" />
+    <Content Include="App_Data\themes\Element\404.html" />
+    <Content Include="App_Data\themes\Element\article-full-width.html" />
+    <Content Include="App_Data\themes\Element\article-sidebar.html" />
+    <Content Include="App_Data\themes\Element\categories-latest-post.html" />
+    <Content Include="App_Data\themes\Element\category.html" />
+    <Content Include="App_Data\themes\Element\components\cat-mini-item.html" />
+    <Content Include="App_Data\themes\Element\components\category-section.html" />
+    <Content Include="App_Data\themes\Element\components\cover-image.html" />
+    <Content Include="App_Data\themes\Element\components\footer-column.html" />
+    <Content Include="App_Data\themes\Element\components\post-card.html" />
+    <Content Include="App_Data\themes\Element\components\row-post.html" />
+    <Content Include="App_Data\themes\Element\components\section-latest-posts.html" />
+    <Content Include="App_Data\themes\Element\config.txt" />
+    <Content Include="App_Data\themes\Element\home.html" />
+    <Content Include="App_Data\themes\Element\latest-post.html" />
+    <Content Include="App_Data\themes\Element\_layout.html" />
+    <Content Include="App_Data\themes\Folio\404.html" />
+    <Content Include="App_Data\themes\Folio\article-full-width.html" />
+    <Content Include="App_Data\themes\Folio\article-sidebar.html" />
+    <Content Include="App_Data\themes\Folio\categories-latest-post.html" />
+    <Content Include="App_Data\themes\Folio\category.html" />
+    <Content Include="App_Data\themes\Folio\components\cat-mini-item.html" />
+    <Content Include="App_Data\themes\Folio\components\category-section.html" />
+    <Content Include="App_Data\themes\Folio\components\cover-image.html" />
+    <Content Include="App_Data\themes\Folio\components\footer-column.html" />
+    <Content Include="App_Data\themes\Folio\components\post-card.html" />
+    <Content Include="App_Data\themes\Folio\components\row-post.html" />
+    <Content Include="App_Data\themes\Folio\components\section-latest-posts.html" />
+    <Content Include="App_Data\themes\Folio\config.txt" />
+    <Content Include="App_Data\themes\Folio\home.html" />
+    <Content Include="App_Data\themes\Folio\latest-post.html" />
+    <Content Include="App_Data\themes\Folio\_layout.html" />
+    <Content Include="App_Data\themes\LegalDark\404.html" />
+    <Content Include="App_Data\themes\LegalDark\article-full-width.html" />
+    <Content Include="App_Data\themes\LegalDark\article-sidebar.html" />
+    <Content Include="App_Data\themes\LegalDark\categories-latest-post.html" />
+    <Content Include="App_Data\themes\LegalDark\category.html" />
+    <Content Include="App_Data\themes\LegalDark\components\cat-mini-item.html" />
+    <Content Include="App_Data\themes\LegalDark\components\category-section.html" />
+    <Content Include="App_Data\themes\LegalDark\components\cover-image.html" />
+    <Content Include="App_Data\themes\LegalDark\components\footer-column.html" />
+    <Content Include="App_Data\themes\LegalDark\components\post-card.html" />
+    <Content Include="App_Data\themes\LegalDark\components\row-post.html" />
+    <Content Include="App_Data\themes\LegalDark\components\section-latest-posts.html" />
+    <Content Include="App_Data\themes\LegalDark\config.txt" />
+    <Content Include="App_Data\themes\LegalDark\home.html" />
+    <Content Include="App_Data\themes\LegalDark\latest-post.html" />
+    <Content Include="App_Data\themes\LegalDark\_layout.html" />
+    <Content Include="App_Data\themes\Legal\404.html" />
+    <Content Include="App_Data\themes\Legal\article-full-width.html" />
+    <Content Include="App_Data\themes\Legal\article-sidebar.html" />
+    <Content Include="App_Data\themes\Legal\categories-latest-post.html" />
+    <Content Include="App_Data\themes\Legal\category.html" />
+    <Content Include="App_Data\themes\Legal\components\cat-mini-item.html" />
+    <Content Include="App_Data\themes\Legal\components\category-section.html" />
+    <Content Include="App_Data\themes\Legal\components\cover-image.html" />
+    <Content Include="App_Data\themes\Legal\components\footer-column.html" />
+    <Content Include="App_Data\themes\Legal\components\post-card.html" />
+    <Content Include="App_Data\themes\Legal\components\row-post.html" />
+    <Content Include="App_Data\themes\Legal\components\section-latest-posts.html" />
+    <Content Include="App_Data\themes\Legal\config.txt" />
+    <Content Include="App_Data\themes\Legal\home.html" />
+    <Content Include="App_Data\themes\Legal\latest-post.html" />
+    <Content Include="App_Data\themes\Legal\_layout.html" />
+    <Content Include="App_Data\themes\Mosaic\404.html" />
+    <Content Include="App_Data\themes\Mosaic\article-full-width.html" />
+    <Content Include="App_Data\themes\Mosaic\article-sidebar.html" />
+    <Content Include="App_Data\themes\Mosaic\categories-latest-post.html" />
+    <Content Include="App_Data\themes\Mosaic\category.html" />
+    <Content Include="App_Data\themes\Mosaic\components\cat-mini-item.html" />
+    <Content Include="App_Data\themes\Mosaic\components\category-section.html" />
+    <Content Include="App_Data\themes\Mosaic\components\cover-image.html" />
+    <Content Include="App_Data\themes\Mosaic\components\footer-column.html" />
+    <Content Include="App_Data\themes\Mosaic\components\post-card.html" />
+    <Content Include="App_Data\themes\Mosaic\components\row-post.html" />
+    <Content Include="App_Data\themes\Mosaic\components\section-latest-posts.html" />
+    <Content Include="App_Data\themes\Mosaic\config.txt" />
+    <Content Include="App_Data\themes\Mosaic\home.html" />
+    <Content Include="App_Data\themes\Mosaic\latest-post.html" />
+    <Content Include="App_Data\themes\Mosaic\_layout.html" />
+    <Content Include="App_Data\themes\Riso\404.html" />
+    <Content Include="App_Data\themes\Riso\article-full-width.html" />
+    <Content Include="App_Data\themes\Riso\article-sidebar.html" />
+    <Content Include="App_Data\themes\Riso\categories-latest-post.html" />
+    <Content Include="App_Data\themes\Riso\category.html" />
+    <Content Include="App_Data\themes\Riso\components\cat-mini-item.html" />
+    <Content Include="App_Data\themes\Riso\components\category-section.html" />
+    <Content Include="App_Data\themes\Riso\components\cover-image.html" />
+    <Content Include="App_Data\themes\Riso\components\footer-column.html" />
+    <Content Include="App_Data\themes\Riso\components\post-card.html" />
+    <Content Include="App_Data\themes\Riso\components\row-post.html" />
+    <Content Include="App_Data\themes\Riso\components\section-latest-posts.html" />
+    <Content Include="App_Data\themes\Riso\config.txt" />
+    <Content Include="App_Data\themes\Riso\home.html" />
+    <Content Include="App_Data\themes\Riso\latest-post.html" />
+    <Content Include="App_Data\themes\Riso\_layout.html" />
+    <Content Include="App_Data\themes\RiverCove\404.html" />
+    <Content Include="App_Data\themes\RiverCove\article-full-width.html" />
+    <Content Include="App_Data\themes\RiverCove\article-sidebar.html" />
+    <Content Include="App_Data\themes\RiverCove\categories-latest-post.html" />
+    <Content Include="App_Data\themes\RiverCove\category.html" />
+    <Content Include="App_Data\themes\RiverCove\components\cat-mini-item.html" />
+    <Content Include="App_Data\themes\RiverCove\components\category-section.html" />
+    <Content Include="App_Data\themes\RiverCove\components\cover-image.html" />
+    <Content Include="App_Data\themes\RiverCove\components\footer-column.html" />
+    <Content Include="App_Data\themes\RiverCove\components\post-card.html" />
+    <Content Include="App_Data\themes\RiverCove\components\row-post.html" />
+    <Content Include="App_Data\themes\RiverCove\components\section-latest-posts.html" />
+    <Content Include="App_Data\themes\RiverCove\config.txt" />
+    <Content Include="App_Data\themes\RiverCove\home.html" />
+    <Content Include="App_Data\themes\RiverCove\latest-post.html" />
+    <Content Include="App_Data\themes\RiverCove\_layout.html" />
+    <Content Include="App_Data\themes\Solarpunk\404.html" />
+    <Content Include="App_Data\themes\Solarpunk\article-full-width.html" />
+    <Content Include="App_Data\themes\Solarpunk\article-sidebar.html" />
+    <Content Include="App_Data\themes\Solarpunk\categories-latest-post.html" />
+    <Content Include="App_Data\themes\Solarpunk\category.html" />
+    <Content Include="App_Data\themes\Solarpunk\components\cat-mini-item.html" />
+    <Content Include="App_Data\themes\Solarpunk\components\category-section.html" />
+    <Content Include="App_Data\themes\Solarpunk\components\cover-image.html" />
+    <Content Include="App_Data\themes\Solarpunk\components\footer-column.html" />
+    <Content Include="App_Data\themes\Solarpunk\components\post-card.html" />
+    <Content Include="App_Data\themes\Solarpunk\components\row-post.html" />
+    <Content Include="App_Data\themes\Solarpunk\components\section-latest-posts.html" />
+    <Content Include="App_Data\themes\Solarpunk\config.txt" />
+    <Content Include="App_Data\themes\Solarpunk\home.html" />
+    <Content Include="App_Data\themes\Solarpunk\latest-post.html" />
+    <Content Include="App_Data\themes\Solarpunk\_layout.html" />
+    <Content Include="App_Data\themes\Swiss\404.html" />
+    <Content Include="App_Data\themes\Swiss\article-full-width.html" />
+    <Content Include="App_Data\themes\Swiss\article-sidebar.html" />
+    <Content Include="App_Data\themes\Swiss\categories-latest-post.html" />
+    <Content Include="App_Data\themes\Swiss\category.html" />
+    <Content Include="App_Data\themes\Swiss\components\cat-mini-item.html" />
+    <Content Include="App_Data\themes\Swiss\components\category-section.html" />
+    <Content Include="App_Data\themes\Swiss\components\cover-image.html" />
+    <Content Include="App_Data\themes\Swiss\components\footer-column.html" />
+    <Content Include="App_Data\themes\Swiss\components\post-card.html" />
+    <Content Include="App_Data\themes\Swiss\components\row-post.html" />
+    <Content Include="App_Data\themes\Swiss\components\section-latest-posts.html" />
+    <Content Include="App_Data\themes\Swiss\config.txt" />
+    <Content Include="App_Data\themes\Swiss\home.html" />
+    <Content Include="App_Data\themes\Swiss\latest-post.html" />
+    <Content Include="App_Data\themes\Swiss\_layout.html" />
+    <Content Include="App_Data\themes\ValentineLight\404.html" />
+    <Content Include="App_Data\themes\ValentineLight\article-full-width.html" />
+    <Content Include="App_Data\themes\ValentineLight\article-sidebar.html" />
+    <Content Include="App_Data\themes\ValentineLight\categories-latest-post.html" />
+    <Content Include="App_Data\themes\ValentineLight\category.html" />
+    <Content Include="App_Data\themes\ValentineLight\components\cat-mini-item.html" />
+    <Content Include="App_Data\themes\ValentineLight\components\category-section.html" />
+    <Content Include="App_Data\themes\ValentineLight\components\cover-image.html" />
+    <Content Include="App_Data\themes\ValentineLight\components\footer-column.html" />
+    <Content Include="App_Data\themes\ValentineLight\components\post-card.html" />
+    <Content Include="App_Data\themes\ValentineLight\components\row-post.html" />
+    <Content Include="App_Data\themes\ValentineLight\components\section-latest-posts.html" />
+    <Content Include="App_Data\themes\ValentineLight\config.txt" />
+    <Content Include="App_Data\themes\ValentineLight\home.html" />
+    <Content Include="App_Data\themes\ValentineLight\latest-post.html" />
+    <Content Include="App_Data\themes\ValentineLight\_layout.html" />
+    <Content Include="App_Data\themes\Valentine\404.html" />
+    <Content Include="App_Data\themes\Valentine\article-full-width.html" />
+    <Content Include="App_Data\themes\Valentine\article-sidebar.html" />
+    <Content Include="App_Data\themes\Valentine\categories-latest-post.html" />
+    <Content Include="App_Data\themes\Valentine\category.html" />
+    <Content Include="App_Data\themes\Valentine\components\cat-mini-item.html" />
+    <Content Include="App_Data\themes\Valentine\components\category-section.html" />
+    <Content Include="App_Data\themes\Valentine\components\cover-image.html" />
+    <Content Include="App_Data\themes\Valentine\components\footer-column.html" />
+    <Content Include="App_Data\themes\Valentine\components\post-card.html" />
+    <Content Include="App_Data\themes\Valentine\components\row-post.html" />
+    <Content Include="App_Data\themes\Valentine\components\section-latest-posts.html" />
+    <Content Include="App_Data\themes\Valentine\config.txt" />
+    <Content Include="App_Data\themes\Valentine\home.html" />
+    <Content Include="App_Data\themes\Valentine\latest-post.html" />
+    <Content Include="App_Data\themes\Valentine\_layout.html" />
+    <Content Include="App_Data\themes\Victoria\404.html" />
+    <Content Include="App_Data\themes\Victoria\article-full-width.html" />
+    <Content Include="App_Data\themes\Victoria\article-sidebar.html" />
+    <Content Include="App_Data\themes\Victoria\categories-latest-post.html" />
+    <Content Include="App_Data\themes\Victoria\category.html" />
+    <Content Include="App_Data\themes\Victoria\components\cat-mini-item.html" />
+    <Content Include="App_Data\themes\Victoria\components\category-section.html" />
+    <Content Include="App_Data\themes\Victoria\components\cover-image.html" />
+    <Content Include="App_Data\themes\Victoria\components\footer-column.html" />
+    <Content Include="App_Data\themes\Victoria\components\post-card.html" />
+    <Content Include="App_Data\themes\Victoria\components\row-post.html" />
+    <Content Include="App_Data\themes\Victoria\components\section-latest-posts.html" />
+    <Content Include="App_Data\themes\Victoria\config.txt" />
+    <Content Include="App_Data\themes\Victoria\home.html" />
+    <Content Include="App_Data\themes\Victoria\latest-post.html" />
+    <Content Include="App_Data\themes\Victoria\_layout.html" />
+    <Content Include="assets\themes\Almanac\almanac.css" />
+    <Content Include="assets\themes\Almanac\showcase.jpg" />
+    <Content Include="assets\themes\Broadsheet-cs\broadsheet-cs.css" />
+    <Content Include="assets\themes\Broadsheet-cs\img\showcase.jpg" />
+    <Content Include="assets\themes\Broadsheet-cs\showcase.jpg" />
+    <Content Include="assets\themes\Cathode\cathode.css" />
+    <Content Include="assets\themes\Cathode\showcase.jpg" />
+    <Content Include="assets\themes\Cipher\cipher.css" />
+    <Content Include="assets\themes\Cipher\img\hero.jpg" />
+    <Content Include="assets\themes\Cipher\showcase.jpg" />
+    <Content Include="assets\themes\Corporate\business-handshake.jpg" />
+    <Content Include="assets\themes\Corporate\corporate.css" />
+    <Content Include="assets\themes\Corporate\dark-blue-sky-building.jpg" />
+    <Content Include="assets\themes\Corporate\gray-sky-building.jpg" />
+    <Content Include="assets\themes\Corporate\showcase.jpg" />
+    <Content Include="assets\themes\DivingDark\beach-sup-board.jpg" />
+    <Content Include="assets\themes\DivingDark\beach-sup.jpg" />
+    <Content Include="assets\themes\DivingDark\dive-coral-site.jpg" />
+    <Content Include="assets\themes\DivingDark\divingdark.css" />
+    <Content Include="assets\themes\DivingDark\people-dive-01.jpg" />
+    <Content Include="assets\themes\DivingDark\people-dive-02.jpg" />
+    <Content Include="assets\themes\DivingDark\people-dive-coral.jpg" />
+    <Content Include="assets\themes\DivingDark\people-seabed-dive.jpg" />
+    <Content Include="assets\themes\DivingDark\showcase.jpg" />
+    <Content Include="assets\themes\DivingDark\standup-paddle-board-01.jpg" />
+    <Content Include="assets\themes\Diving\beach-sup-board.jpg" />
+    <Content Include="assets\themes\Diving\beach-sup.jpg" />
+    <Content Include="assets\themes\Diving\dive-coral-site.jpg" />
+    <Content Include="assets\themes\Diving\diving.css" />
+    <Content Include="assets\themes\Diving\people-dive-01.jpg" />
+    <Content Include="assets\themes\Diving\people-dive-02.jpg" />
+    <Content Include="assets\themes\Diving\people-dive-coral.jpg" />
+    <Content Include="assets\themes\Diving\people-seabed-dive.jpg" />
+    <Content Include="assets\themes\Diving\showcase.jpg" />
+    <Content Include="assets\themes\Diving\standup-paddle-board-01.jpg" />
+    <Content Include="assets\themes\Element\element.css" />
+    <Content Include="assets\themes\Element\img\chemical.jpg" />
+    <Content Include="assets\themes\Element\img\element.jpg" />
+    <Content Include="assets\themes\Element\img\showcase.jpg" />
+    <Content Include="assets\themes\Element\showcase.jpg" />
+    <Content Include="assets\themes\Folio\folio.css" />
+    <Content Include="assets\themes\Folio\img\hero.jpg" />
+    <Content Include="assets\themes\Folio\showcase.jpg" />
+    <Content Include="assets\themes\hearth-cs\hearth.css" />
+    <Content Include="assets\themes\hearth-cs\img\showcase.jpg" />
+    <Content Include="assets\themes\hearth-cs\showcase.jpg" />
+    <Content Include="assets\themes\LegalDark\business-handshake.jpg" />
+    <Content Include="assets\themes\LegalDark\contract.jpg" />
+    <Content Include="assets\themes\LegalDark\legaldark.css" />
+    <Content Include="assets\themes\LegalDark\people-lawyer-lawbook-table.jpg" />
+    <Content Include="assets\themes\LegalDark\pro-photograph-lawbooks-dark.jpg" />
+    <Content Include="assets\themes\LegalDark\showcase.jpg" />
+    <Content Include="assets\themes\LegalDark\signing-doc.jpg" />
+    <Content Include="assets\themes\Legal\business-handshake.jpg" />
+    <Content Include="assets\themes\Legal\contract.jpg" />
+    <Content Include="assets\themes\Legal\legal.css" />
+    <Content Include="assets\themes\Legal\people-lawyer-lawbook-table.jpg" />
+    <Content Include="assets\themes\Legal\pro-photograph-lawbooks-dark.jpg" />
+    <Content Include="assets\themes\Legal\showcase.jpg" />
+    <Content Include="assets\themes\Legal\signing-doc.jpg" />
+    <Content Include="assets\themes\Mosaic\img\hero.jpg" />
+    <Content Include="assets\themes\Mosaic\mosaic.css" />
+    <Content Include="assets\themes\Mosaic\showcase.jpg" />
+    <Content Include="assets\themes\Riso\riso.css" />
+    <Content Include="assets\themes\Riso\showcase.jpg" />
+    <Content Include="assets\themes\RiverCove\img\showcase.jpg" />
+    <Content Include="assets\themes\RiverCove\rivercove.css" />
+    <Content Include="assets\themes\RiverCove\showcase.jpg" />
+    <Content Include="assets\themes\Solarpunk\showcase.jpg" />
+    <Content Include="assets\themes\Solarpunk\solarpunk.css" />
+    <Content Include="assets\themes\Swiss\showcase.jpg" />
+    <Content Include="assets\themes\Swiss\swiss.css" />
+    <Content Include="assets\themes\ValentineLight\beasternchen-sheet-music.jpg" />
+    <Content Include="assets\themes\ValentineLight\love-biscuit-candy.jpg" />
+    <Content Include="assets\themes\ValentineLight\showcase.jpg" />
+    <Content Include="assets\themes\ValentineLight\valentinelight.css" />
+    <Content Include="assets\themes\ValentineLight\ylanite-love.jpg" />
+    <Content Include="assets\themes\Valentine\beasternchen-sheet-music.jpg" />
+    <Content Include="assets\themes\Valentine\love-biscuit-candy.jpg" />
+    <Content Include="assets\themes\Valentine\showcase.jpg" />
+    <Content Include="assets\themes\Valentine\valentine.css" />
+    <Content Include="assets\themes\Valentine\ylanite-love.jpg" />
+    <Content Include="assets\themes\Victoria\img\clock.jpg" />
+    <Content Include="assets\themes\Victoria\img\showcase.jpg" />
+    <Content Include="assets\themes\Victoria\showcase.jpg" />
+    <Content Include="assets\themes\Victoria\victoria.css" />
+    <Content Include="Global.asax" />
+    <None Include="Pageless-Architecture.txt" />
+    <Content Include="Web.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="engine\CsTemplate\CsTemplate.cs" />
+    <Compile Include="engine\CsTemplate\CsThemeRegistry.cs" />
+    <Compile Include="engine\CsTemplate\Themes\Hearth\Hearth.cs" />
+    <Compile Include="engine\CsTemplate\Themes\Hearth\Layout.cs" />
+    <Compile Include="engine\CsTemplate\Themes\Hearth\Hearth-Home.cs" />
+    <Compile Include="engine\CsTemplate\Themes\Hearth\Hearth-Post.cs" />
+    <Compile Include="engine\CsTemplate\Themes\Hearth\Hearth-Page.cs" />
+    <Compile Include="engine\CsTemplate\Themes\Hearth\Hearth-Latest-Post.cs" />
+    <Compile Include="engine\CsTemplate\Themes\Hearth\Hearth-Category.cs" />
+    <Compile Include="engine\CsTemplate\Themes\Hearth\Hearth-Categories-Latest-Post.cs" />
+    <Compile Include="engine\CsTemplate\Themes\Hearth\Hearth-NotFound.cs" />
+    <Compile Include="engine\CsTemplate\Themes\Broadsheet\Broadsheet.cs" />
+    <Compile Include="engine\CsTemplate\Themes\Broadsheet\Layout.cs" />
+    <Compile Include="engine\CsTemplate\Themes\Broadsheet\Broadsheet-Home.cs" />
+    <Compile Include="engine\CsTemplate\Themes\Broadsheet\Broadsheet-Post.cs" />
+    <Compile Include="engine\CsTemplate\Themes\Broadsheet\Broadsheet-Page.cs" />
+    <Compile Include="engine\CsTemplate\Themes\Broadsheet\Broadsheet-Latest-Post.cs" />
+    <Compile Include="engine\CsTemplate\Themes\Broadsheet\Broadsheet-Category.cs" />
+    <Compile Include="engine\CsTemplate\Themes\Broadsheet\Broadsheet-Categories-Latest-Post.cs" />
+    <Compile Include="engine\CsTemplate\Themes\Broadsheet\Broadsheet-NotFound.cs" />
+    <Compile Include="engine\FileCacheEngine.cs" />
+    <Compile Include="engine\Markdown\HtmlToMarkdown.cs" />
+    <Compile Include="engine\Markdown\MarkdownToHtml.cs" />
+    <Compile Include="engine\RH\CategoriesLatestPostPage.cs" />
+    <Compile Include="engine\RH\CategoryPage.cs" />
+    <Compile Include="engine\RH\LatestPostPage.cs" />
+    <Compile Include="engine\SQLiteExpress\SQLiteColumn.cs" />
+    <Compile Include="engine\SQLiteExpress\SQLiteColumnList.cs" />
+    <Compile Include="engine\SQLiteExpress\SQLiteEnums.cs" />
+    <Compile Include="engine\SQLiteExpress\SQLiteExpress.cs" />
+    <Compile Include="engine\SQLiteExpress\SQLiteTable.cs" />
+    <Compile Include="engine\Config.cs" />
+    <Compile Include="engine\ImageThumb.cs" />
+    <Compile Include="engine\FaviconGenerator.cs" />
+    <Compile Include="engine\AdminSlug.cs" />
+    <Compile Include="engine\SessionStore.cs" />
+    <Compile Include="engine\ApiHelper.cs" />
+    <Compile Include="engine\Auth.cs" />
+    <Compile Include="engine\RememberMe.cs" />
+    <Compile Include="engine\Db.cs" />
+    <Compile Include="engine\DateDisplay.cs" />
+    <Compile Include="engine\Settings.cs" />
+    <Compile Include="engine\PublicTemplate.cs" />
+    <Compile Include="engine\NavNode.cs" />
+    <Compile Include="engine\NavMenu.cs" />
+    <Compile Include="engine\TemplateEngine.cs" />
+    <Compile Include="engine\CategoryManager.cs" />
+    <Compile Include="engine\Models\obCategory.cs" />
+    <Compile Include="engine\Models\obCategoryPost.cs" />
+    <Compile Include="engine\RH\AdminCategories.cs" />
+    <Compile Include="engine\RH\AdminThemeDocs.cs" />
+    <Compile Include="engine\RH\AdminGuidelines.cs" />
+    <Compile Include="engine\RH\InstallPage.cs" />
+    <Compile Include="engine\RH\AdminCategoriesApi.cs" />
+    <Compile Include="engine\RH\MigrationImportApi.cs" />
+    <Compile Include="engine\RH\GetArticleMarkdownApi.cs" />
+    <Compile Include="engine\RH\AdminThemeDocsCSharp.cs" />
+    <Compile Include="engine\RH\AdminMarkdownDocs.cs" />
+    <Compile Include="engine\AdminTemplate.cs" />
+    <Compile Include="engine\ContentEditor.cs" />
+    <Compile Include="engine\Models\obUser.cs" />
+    <Compile Include="engine\Models\obPage.cs" />
+    <Compile Include="engine\Models\obPost.cs" />
+    <Compile Include="engine\Models\obMedia.cs" />
+    <Compile Include="engine\Models\obSetting.cs" />
+    <Compile Include="engine\RH\HomePage.cs" />
+    <Compile Include="engine\RH\PostPage.cs" />
+    <Compile Include="engine\RH\PagePage.cs" />
+    <Compile Include="engine\RH\DocLayout.cs" />
+    <Compile Include="engine\RH\DocCrumb.cs" />
+    <Compile Include="engine\RH\DocModel.cs" />
+    <Compile Include="engine\RH\DocRecentItem.cs" />
+    <Compile Include="engine\RH\HomeLayouts.cs" />
+    <Compile Include="engine\RH\NotFoundPage.cs" />
+    <Compile Include="engine\RH\LoginPage.cs" />
+    <Compile Include="engine\RH\LoginApi.cs" />
+    <Compile Include="engine\RH\LogoutHandler.cs" />
+    <Compile Include="engine\RH\AdminGuard.cs" />
+    <Compile Include="engine\RH\AdminDashboard.cs" />
+    <Compile Include="engine\RH\AdminPages.cs" />
+    <Compile Include="engine\RH\AdminPagesApi.cs" />
+    <Compile Include="engine\RH\AdminTrashUi.cs" />
+    <Compile Include="engine\RH\AdminPosts.cs" />
+    <Compile Include="engine\RH\AdminPostsApi.cs" />
+    <Compile Include="engine\RH\AdminMedia.cs" />
+    <Compile Include="engine\RH\AdminMediaApi.cs" />
+    <Compile Include="engine\RH\AdminSettings.cs" />
+    <Compile Include="engine\RH\AdminSettingsApi.cs" />
+    <Compile Include="engine\RH\AdminNavBuilder.cs" />
+    <Compile Include="engine\RH\AdminPreviewApi.cs" />
+    <Compile Include="engine\ThemeManager.cs" />
+    <Compile Include="engine\RH\AdminThemes.cs" />
+    <Compile Include="engine\RH\AdminTemplateEdit.cs" />
+    <Compile Include="engine\RH\AdminThemesApi.cs" />
+    <Compile Include="engine\PublicPageCache.cs" />
+    <Compile Include="engine\SitemapGenerator.cs" />
+    <Compile Include="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="css\admin.css" />
+    <Content Include="css\AdminThemeEditor.css" />
+    <Content Include="css\login.css" />
+    <Content Include="css\editor.css" />
+    <Content Include="js\site.js" />
+    <Content Include="js\admin.js" />
+    <Content Include="js\AdminThemeEditor.js" />
+    <Content Include="js\editor.js" />
+    <Content Include="js\media-browser.js" />
+    <Content Include="js\admin-nav-builder.js" />
+    <Content Include="fonts\fontawesome\css\all.min.css" />
+    <Content Include="fonts\fontawesome\webfonts\fa-brands-400.woff2" />
+    <Content Include="fonts\fontawesome\webfonts\fa-regular-400.woff2" />
+    <Content Include="fonts\fontawesome\webfonts\fa-solid-900.woff2" />
+    <Content Include="fonts\fontawesome\webfonts\fa-v4compatibility.woff2" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="uploads\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="engine\SQLiteExpress\README.md" />
+    <Content Include="engine\Markdown\README.md" />
+    <Content Include="App_Data\config.txt.example" />
+    <Content Include="App_Data\reset_admin.txt.example" />
+    <None Include="packages.config" />
+    <None Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>63417</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:63417/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.119.0\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.119.0\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets'))" />
+  </Target>
+  <Import Project="..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.119.0\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets" Condition="Exists('..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.119.0\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets')" />
+</Project>
