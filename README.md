@@ -18,6 +18,11 @@ The architecture behind this CMS is documented in a dedicated article series:
 - [Three Approaches to ASP.NET Web Forms Architecture](https://adriancs.com/three-approaches-to-asp-net-web-forms-architecture/)
 - [Comparing Web Architectures in the .NET World](https://adriancs.com/comparing-web-architectures-in-net-world/)
 
+![Screenshot - Theme Hearth](https://raw.githubusercontent.com/ASP-NET-Web-Forms-Club/Hearth-CMS/refs/heads/main/src/hearthcms/assets/themes/hearth-cs/showcase.jpg)
+![Screenshot - Theme RiverCove](https://raw.githubusercontent.com/ASP-NET-Web-Forms-Club/Hearth-CMS/refs/heads/main/src/hearthcms/assets/themes/RiverCove/showcase.jpg)
+![Screenshot - Theme Valentine](https://raw.githubusercontent.com/ASP-NET-Web-Forms-Club/Hearth-CMS/refs/heads/main/src/hearthcms/assets/themes/ValentineLight/showcase.jpg)
+![Screenshot - Theme Corporate](https://raw.githubusercontent.com/ASP-NET-Web-Forms-Club/Hearth-CMS/refs/heads/main/src/hearthcms/assets/themes/Corporate/showcase.jpg)
+
 ## Features
 
 - **Posts & pages** — full writing and management workflow, draft/publish, soft-delete trash, slugs served at the site root.
