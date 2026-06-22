@@ -20,8 +20,8 @@ The architecture behind this CMS is documented in a dedicated article series:
 
 ![Screenshot - Theme Hearth](https://raw.githubusercontent.com/ASP-NET-Web-Forms-Club/Hearth-CMS/refs/heads/main/src/hearthcms/assets/themes/hearth-cs/showcase.jpg)
 ![Screenshot - Theme RiverCove](https://raw.githubusercontent.com/ASP-NET-Web-Forms-Club/Hearth-CMS/refs/heads/main/src/hearthcms/assets/themes/RiverCove/showcase.jpg)
-![Screenshot - Theme Valentine](https://raw.githubusercontent.com/ASP-NET-Web-Forms-Club/Hearth-CMS/refs/heads/main/src/hearthcms/assets/themes/ValentineLight/showcase.jpg)
 ![Screenshot - Theme Corporate](https://raw.githubusercontent.com/ASP-NET-Web-Forms-Club/Hearth-CMS/refs/heads/main/src/hearthcms/assets/themes/Corporate/showcase.jpg)
+![Screenshot - Theme Valentine](https://raw.githubusercontent.com/ASP-NET-Web-Forms-Club/Hearth-CMS/refs/heads/main/src/hearthcms/assets/themes/ValentineLight/showcase.jpg)
 
 ## Features
 
