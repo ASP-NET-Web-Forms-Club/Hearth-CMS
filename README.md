@@ -11,6 +11,13 @@ A lightweight, self-contained content management system built on ASP.NET (.NET F
 
 Hearth is built by using **Pageless ASP.NET Web Forms Architecture** (PAW). Every page is rendered in C# and routed through a single switch in `Global.asax.cs`. No `.aspx` files, no master pages, no server controls, no ViewState, no page lifecycle. The frontend talks to the backend purely through the Fetch API. The world's first web application uses PAW Architecture. This project serves as the testimony of PAW Architecture.
 
+The architecture behind this CMS is documented in a dedicated article series:
+
+- [Introducing ASP.NET Web Forms Pageless Architecture (WPA)](https://adriancs.com)
+- [True Pageless Architecture with Custom Session State](https://adriancs.com/asp-net-web-forms-true-pageless-architecture-with-custom-session-state/)
+- [Three Approaches to ASP.NET Web Forms Architecture](https://adriancs.com/three-approaches-to-asp-net-web-forms-architecture/)
+- [Comparing Web Architectures in the .NET World](https://adriancs.com/comparing-web-architectures-in-net-world/)
+
 ## Features
 
 - **Posts & pages** — full writing and management workflow, draft/publish, soft-delete trash, slugs served at the site root.
