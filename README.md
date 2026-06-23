@@ -33,6 +33,7 @@ The architecture behind this CMS is documented in a dedicated article series:
 - **Two theming models** — folder-based HTML themes (editable in the admin) *and* compiled C# themes. Ships with reference themes (Hearth, Broadsheet).
 - **Lightning-fast page serving** — two-tier public page cache: an LRU, byte-budgeted **RAM cache** plus an optional **file cache**, shared across all visitors.
 - **Automatic favicon generator** — upload one master image; Hearth produces the full favicon set (ICO + PNGs + web manifest).
+- **Pure server-rendered HTML, SEO-friendly by design** — every page ships as complete, structured, human-readable HTML on the very first request. No JavaScript SPA, no client-side hydration, no rendering abstraction layer — the full content is present in the raw markup the moment it leaves the server. Search engine crawlers (and anyone viewing source) get the entire page cleanly and immediately, with zero abstraction. Old-school HTML, maximum crawlability.
 - **Automatic OG / social meta tags** — Open Graph and Twitter Card tags wired across every page.
 - **Automatic sitemap** — live-generated `sitemap.xml` and `robots.txt`.
 - **Custom session + Remember Me** — lock-free in-memory session available at `BeginRequest`, persistent across app-pool recycles.
