@@ -303,7 +303,7 @@ namespace System.engine.RH
         <table class='data-table'>
             <thead><tr><th>Token</th><th>Type</th><th>Contains / sample</th></tr></thead>
             <tbody>
-                <tr><td><code>{{breadcrumbs}}</code></td><td>raw</td><td>Breadcrumb nav. <span class='form-hint'>Post: Home / Blog / Essays / Title &middot; Page: Home / Title</span></td></tr>
+                <tr><td><code>{{breadcrumbs}}</code></td><td>raw</td><td>Breadcrumb nav. <span class='form-hint'>Post: Home / Essays / Title &middot; Page: Home / Title</span></td></tr>
                 <tr><td><code>{{article_title}}</code></td><td>text</td><td>The article title. <span class='form-hint'>e.g. <code>Welcome to Hearth</code></span></td></tr>
                 <tr><td><code>{{published_date}}</code></td><td>raw</td><td>Published-date line, or empty (pages have none). <span class='form-hint'>e.g. <code>&lt;div class='doc-meta'&gt;&hellip; January 1, 2026&lt;/div&gt;</code></span></td></tr>
                 <tr><td><code>{{updated_date}}</code></td><td>raw</td><td>&ldquo;Updated &hellip;&rdquo; line, or empty when no modified date.</td></tr>
@@ -495,7 +495,7 @@ namespace System.engine.RH
                 <tr><td><code>data-edit-icon='key'</code></td><td>its Font Awesome <code>class</code></td><td>the icon picker</td></tr>
             </tbody>
         </table>
-        <pre><code>&lt;a   data-edit-href='cta_url'   href='/blog'&gt;&lt;span data-edit='cta_label'&gt;Read the blog&lt;/span&gt;&lt;/a&gt;
+        <pre><code>&lt;a   data-edit-href='cta_url'   href='/latest-post'&gt;&lt;span data-edit='cta_label'&gt;Read the lastest posts&lt;/span&gt;&lt;/a&gt;
 &lt;img data-edit-src='hero_image' src='/assets/themes/{slug}/img/hero.jpg' alt='' /&gt;
 &lt;i   data-edit-icon='hero_icon' class='fa-solid fa-fire'&gt;&lt;/i&gt;
 &lt;div data-edit-bg='banner_bg' style='background-image:url(&quot;/uploads/banner.jpg&quot;)'&gt;&hellip;&lt;/div&gt;</code></pre>

@@ -21,7 +21,7 @@ namespace System.engine.RH
     // Public rendering lives in NavMenu.RenderPublicNav() (now in
     // System.engine, file engine/NavMenu.cs), which is called from
     // PublicTemplate. When no custom menu has been saved it falls back
-    // to a sensible default (Home, Blog, and any published pages flagged
+    // to a sensible default (Home, and any published pages flagged
     // show_in_nav) so existing sites keep their navigation untouched.
     // ============================================================
 
@@ -83,7 +83,6 @@ namespace System.engine.RH
             var quick = new List<object>
             {
                 new { label = "Home", url = "/" },
-                new { label = "Blog", url = "/blog" },
                 new { label = "Latest posts", url = "/latest-post" },
                 new { label = "Categories", url = "/categories-latest-post" }
             };

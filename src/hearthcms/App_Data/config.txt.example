@@ -22,7 +22,7 @@
 # /login page. Visit the slug while signed out to sign in.
 #
 # Allowed: letters, numbers, hyphen, underscore. Reserved words
-# (blog, logout, api, category, reset_app, home, ...) are rejected.
+# (latest-post, logout, api, category, reset_app, home, ...) are rejected.
 # ------------------------------------------------------------------
 
 admin_url=admin

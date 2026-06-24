@@ -82,12 +82,12 @@ namespace System.engine.RH
                 ? MarkdownToHtml.ToHtml(post.Content ?? "")
                 : (post.Content ?? "");
 
-            // Breadcrumbs: Home / Blog / [Category] / Title.
+            // Breadcrumbs: Home / Latest Post / [Category] / Title.
             // The category links to /category/{slug} (Phase 3 route).
             var crumbs = new List<DocCrumb>
             {
                 new DocCrumb("Home", "/"),
-                new DocCrumb("Blog", "/blog")
+                new DocCrumb("Latest Post", "/latest-post")
             };
             string asideHeading = "Keep reading";
             if (post.CategoryId > 0)

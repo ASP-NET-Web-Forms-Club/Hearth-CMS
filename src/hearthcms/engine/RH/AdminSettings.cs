@@ -251,7 +251,6 @@ namespace System.engine.RH
                     <option value='1'{(homeMode == "1" ? " selected" : "")}>Page</option>
                     <option value='2'{(homeMode == "2" ? " selected" : "")}>Latest Post</option>
                     <option value='3'{(homeMode == "3" ? " selected" : "")}>Category List + Latest Post</option>
-                    <option value='4'{(homeMode == "4" ? " selected" : "")}>Blog Page</option>
                 </select>
             </div>
             <div class='form-field' id='homePageSelectField' style='{(homeMode == "1" ? "" : "display:none")}'>

@@ -120,7 +120,6 @@ namespace System.engine
         {
             if (string.IsNullOrEmpty(path)) return false;
             if (path == "/" || path == "/home") return true;
-            if (path == "/blog") return true;
             // Pages and posts are served prefix-less at the root ("/{slug}").
             // Any single-segment path that isn't a reserved app route is a
             // content candidate and therefore cacheable. Multi-segment paths
@@ -140,7 +139,6 @@ namespace System.engine
             switch (path.Substring(1))
             {
                 case "home":
-                case "blog":
                 case "latest-post":
                 case "categories-latest-post":
                 case "login":

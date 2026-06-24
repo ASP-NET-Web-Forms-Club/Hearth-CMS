@@ -144,7 +144,7 @@ namespace System
 
             // ===== C# theme dispatch =====
             // If the active theme is a code-rendered (C#) theme, let it own the
-            // public content routes (home, single post/page, blog, latest, etc.).
+            // public content routes (home, single post/page, latest, etc.).
             // Admin and API routes are never themed. Any handler the theme didn't
             // override falls back to the HTML-theme path via CsTemplate defaults.
             if (CsThemeRegistry.IsActiveCsTemplate && IsThemeablePath(path))

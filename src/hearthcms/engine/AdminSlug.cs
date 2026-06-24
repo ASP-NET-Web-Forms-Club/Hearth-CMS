@@ -177,7 +177,6 @@ namespace System.engine
             switch (slug.ToLowerInvariant())
             {
                 case "home":
-                case "blog":
                 case "latest-post":
                 case "categories-latest-post":
                 case "logout":

@@ -8,7 +8,7 @@ namespace System.engine
 {
     // Public navigation menu: load/normalize the admin-built menu (stored as the
     // "nav_menu" setting) and render the public <nav> inner markup. When no menu
-    // has been saved it falls back to a sensible default (Home, Blog, and any
+    // has been saved it falls back to a sensible default (Home, any
     // published pages flagged show_in_nav) so existing sites keep their nav.
     //
     // Public rendering (RenderPublicNav) is called by PublicTemplate (HTML themes,
@@ -44,13 +44,13 @@ namespace System.engine
             return JsonConvert.SerializeObject(Load());
         }
 
-        // The legacy/default menu: Home, Blog, then published nav pages.
+        // The legacy/default menu: Home, then published nav pages.
         public static List<NavNode> DefaultMenu()
         {
             var list = new List<NavNode>
             {
                 new NavNode { Label = "Home", Url = "/", Children = new List<NavNode>() },
-                new NavNode { Label = "Blog", Url = "/blog", Children = new List<NavNode>() }
+                new NavNode { Label = "Latest Posts", Url = "/latest-post", Children = new List<NavNode>() }
             };
             try
             {

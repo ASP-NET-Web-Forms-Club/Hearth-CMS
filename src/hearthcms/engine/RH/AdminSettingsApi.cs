@@ -60,7 +60,7 @@ namespace System.engine.RH
                 {
                     ApiHelper.WriteError(
                         "Invalid admin URL. Use letters, numbers, hyphens or underscores, " +
-                        "and avoid reserved words (blog, login, api, category, reset_app, etc.).");
+                        "and avoid reserved words (login, api, category, reset_app, etc.).");
                     return;
                 }
                 Db.SaveSetting(AdminSlug.SettingKey, normalized);
@@ -76,9 +76,9 @@ namespace System.engine.RH
                 if (val == null) continue;
                 val = val.Trim();
                 // Constrain home_page_mode to a known layout id (0=Default, 1=Page,
-                // 2=Latest Post, 3=Categories+Latest, 4=Blog). Anything else -> Default.
+                // 2=Latest Post, 3=Categories+Latest). Anything else -> Default.
                 if (key == "home_page_mode" &&
-                    val != "0" && val != "1" && val != "2" && val != "3" && val != "4")
+                    val != "0" && val != "1" && val != "2" && val != "3")
                 {
                     val = "0";
                 }

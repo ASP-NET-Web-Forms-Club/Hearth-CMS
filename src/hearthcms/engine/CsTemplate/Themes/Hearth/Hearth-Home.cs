@@ -38,7 +38,7 @@ namespace System.engine.CsTemplate.Hearth
         <h1 class='hero-title'>{1}</h1>
         <p class='hero-sub'>{2}</p>
         <div class='hero-actions'>
-            <a href='/blog' class='btn btn-primary'><span>Read the blog</span> <i class='fa-solid fa-arrow-right'></i></a>
+            <a href='/latest-post' class='btn btn-primary'><span>Read the latest posts</span> <i class='fa-solid fa-arrow-right'></i></a>
             <a href='/about' class='btn btn-ghost'><span>About</span></a>
         </div>
         <figure class='hero-figure' style='max-width:560px;margin:36px auto 0'>
@@ -57,7 +57,7 @@ namespace System.engine.CsTemplate.Hearth
     <div class='container'>
         <div class='section-heading'>
             <h2>Latest writing</h2>
-            <a href='/blog' class='section-link'>All posts <i class='fa-solid fa-arrow-right'></i></a>
+            <a href='/latest-post' class='section-link'>All posts <i class='fa-solid fa-arrow-right'></i></a>
         </div>
         <div class='post-grid'>");
 

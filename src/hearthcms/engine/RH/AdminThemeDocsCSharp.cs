@@ -99,7 +99,6 @@ namespace System.engine.RH
                 <tr><td><code>HandlePost(string slug)</code></td><td>A single post. Return <code>false</code> for &ldquo;not found&rdquo; (the caller then tries the next match / 404).</td></tr>
                 <tr><td><code>HandlePage(string slug)</code></td><td>A single page. Same <code>false</code> = not-found contract.</td></tr>
                 <tr><td><code>HandleLatestPost()</code></td><td>The flat latest-posts listing.</td></tr>
-                <tr><td><code>HandleBlog()</code></td><td><code>/blog</code> (defaults to the latest-post listing).</td></tr>
                 <tr><td><code>HandleCategoriesLatestPost()</code></td><td>The per-category sections page.</td></tr>
                 <tr><td><code>HandleCategory(string slug)</code></td><td>A single category listing.</td></tr>
                 <tr><td><code>HandleNotFound()</code></td><td>The 404 page.</td></tr>

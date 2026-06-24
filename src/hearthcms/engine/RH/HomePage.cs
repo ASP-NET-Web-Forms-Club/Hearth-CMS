@@ -27,8 +27,6 @@ namespace System.engine.RH
                     LatestPostPage.HandleRequest(); return;
                 case "3": // Categories + latest post   -> /categories-latest-post
                     CategoriesLatestPostPage.HandleRequest(); return;
-                case "4": // Blog page                  -> /latest-post
-                    LatestPostPage.HandleRequest(); return;
             }
 
             var pt = new PublicTemplate { Title = "", BodyClass = "page-home" };

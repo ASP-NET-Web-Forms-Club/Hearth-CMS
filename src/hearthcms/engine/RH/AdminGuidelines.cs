@@ -69,7 +69,7 @@ namespace System.engine.RH
         <p>The normal way. Go to <a href='/admin/settings'>Settings</a> &rarr; <strong>Admin URL</strong>, type the new path segment, and save. The panel moves immediately and you'll be redirected to the new address.</p>
         <ul>
             <li>Use letters, numbers, hyphens and underscores only.</li>
-            <li>Reserved words (<code>blog</code>, <code>logout</code>, <code>api</code>, <code>category</code>, <code>reset_app</code>, <code>home</code>, &hellip;) are rejected.</li>
+            <li>Reserved words (<code>logout</code>, <code>api</code>, <code>category</code>, <code>reset_app</code>, <code>home</code>, &hellip;) are rejected.</li>
             <li><strong>Bookmark the new URL</strong> as soon as you save &mdash; the old one stops working.</li>
         </ul>
         <p class='form-hint'>This value is stored in the database. It applies unless a <code>config.txt</code> override is present (next section), which always wins.</p>

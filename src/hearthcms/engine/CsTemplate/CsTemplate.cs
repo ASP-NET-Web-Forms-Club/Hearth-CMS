@@ -63,9 +63,6 @@ namespace System.engine.CsTemplate
         public virtual bool HandlePage(string slug) { return PagePage.TryHandleRequest(slug); }
 
         public virtual void HandleLatestPost() { LatestPostPage.HandleRequest(); }
-        // /blog has no dedicated handler (the standalone BlogPage is retired);
-        // default to the latest-post listing so the route still resolves.
-        public virtual void HandleBlog() { LatestPostPage.HandleRequest(); }
         public virtual void HandleCategoriesLatestPost() { CategoriesLatestPostPage.HandleRequest(); }
         public virtual void HandleCategory(string slug) { CategoryPage.HandleRequest(slug); }
         public virtual void HandleNotFound() { NotFoundPage.HandleRequest(); }
