@@ -279,6 +279,24 @@ namespace System.engine.CsTemplate
             catch { return null; }
         }
 
+        // One published, non-deleted page by id, or null. Used for the
+        // admin-selected "home page is a Page" mode.
+        public obPage GetPageById(int pageId)
+        {
+            if (pageId <= 0) return null;
+            try
+            {
+                obPage page = WithDb(delegate (SQLiteExpress s)
+                {
+                    var p = new Dictionary<string, object> { { "@id", pageId } };
+                    return s.GetObject<obPage>(
+                        "SELECT * FROM pages WHERE id=@id AND is_published=1 AND is_deleted=0 LIMIT 1;", p);
+                });
+                return (page != null && page.Id > 0) ? page : null;
+            }
+            catch { return null; }
+        }
+
         // A user's display name, or "" when the user is missing/has none.
         public string GetUserDisplayName(int userId)
         {

@@ -35,7 +35,7 @@ namespace System.engine.RH
 <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
 <link rel='stylesheet' href='https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap'>
 <link rel='stylesheet' href='/fonts/fontawesome/css/all.min.css' />
-<link rel='stylesheet' href='/css/site.css' />
+<link rel='stylesheet' href='/css/admin.css' />
 <link rel='stylesheet' href='/css/login.css' />
 </head>
 <body class='page-login'>

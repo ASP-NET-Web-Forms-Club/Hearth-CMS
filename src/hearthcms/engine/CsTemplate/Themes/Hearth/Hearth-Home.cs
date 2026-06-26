@@ -10,6 +10,39 @@ namespace System.engine.CsTemplate.Hearth
     {
         public override void HandleHome()
         {
+            // Honor the admin "Main home page" setting, mirroring the contract in
+            // HomePage.HandleRequest(). Each non-default target keeps its own route
+            // (e.g. /latest-post); selecting it here ALSO renders it at the root.
+            // We delegate to this theme's own handlers so the root stays themed.
+            switch (Settings.HomePageMode)
+            {
+                case "1": // A specific published Page
+                    if (TryRenderSelectedHomePage()) return;
+                    // Fall through to the default home layout if missing/unpublished.
+                    break;
+                case "2": // Latest posts (flat list) -> /latest-post
+                    HandleLatestPost(); return;
+                case "3": // Categories + latest post -> /categories-latest-post
+                    HandleCategoriesLatestPost(); return;
+            }
+
+            RenderDefaultHome();
+        }
+
+        // Renders the admin-selected published page as the home page (themed).
+        // Returns false when no valid published page is configured, so the
+        // caller falls back to the default home layout.
+        bool TryRenderSelectedHomePage()
+        {
+            obPage page = GetPageById(Settings.HomePageId);
+            if (page == null) return false;
+            // Reuse the themed single-page renderer via its slug.
+            return HandlePage(page.Slug);
+        }
+
+        // ----- default home : hero + latest-posts grid + feature row -----
+        void RenderDefaultHome()
+        {
             var layout = new Layout
             {
                 Title = GetSiteName(),
