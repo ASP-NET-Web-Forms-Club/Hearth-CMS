@@ -8,7 +8,7 @@ namespace System.engine
         // ===== Dev / Testing =====
         // When IsDevMode is true the request pipeline auto-logs the admin user
         // so admin pages are reachable without going through the login screen.
-        public static bool IsDevMode = true;
+        public static bool IsDevMode = false;
 
         // ===== Site identity (overridden by Settings table after load) =====
         public static string SiteName = "Hearth CMS";
