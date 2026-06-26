@@ -86,6 +86,7 @@ namespace System.engine
             {NavItem("themes", "/admin/themes", "fa-palette", "Themes")}
             {NavItem("nav", "/admin/nav", "fa-bars-staggered", "Navigation")}
             {NavItem("settings", "/admin/settings", "fa-sliders", "Settings")}
+            {NavItem("users", "/admin/users", "fa-users", "Users")}
             {NavItem("guidelines", "/admin/guidelines", "fa-circle-info", "General Guidelines")}
         </nav>
         <div class='admin-sidebar-footer'>

@@ -17,7 +17,8 @@ namespace System.engine.RH
             "category_post_count", "article_sidebar_post_count",
             "cache_ram_enabled", "cache_file_enabled", "cache_ram_max_mb",
             "home_page_mode", "home_page_id",
-            "date_format"
+            "date_format",
+            "dev_mode"
         };
 
         public static void HandleRequest()
@@ -34,6 +35,8 @@ namespace System.engine.RH
                     case "clear-cache": ClearCache(); break;
                     case "generate-sitemap": GenerateSitemap(); break;
                     case "home-pages-select": HomePagesSelect(); break;
+                    case "generate-api-token": GenerateApiToken(); break;
+                    case "clear-api-token": ClearApiToken(); break;
                     default: ApiHelper.WriteError("Unknown action: " + action); break;
                 }
             }
@@ -209,6 +212,32 @@ namespace System.engine.RH
             TemplateEngine.ClearCache();
             AppSession.SetFlash("Page cache cleared");
             ApiHelper.WriteSuccess("Cache cleared");
+        }
+
+        // Generate a new random API token, store it, and return it so the admin
+        // can copy it. Regenerating immediately invalidates any previous token.
+        static void GenerateApiToken()
+        {
+            string token = NewToken();
+            Db.SaveSetting("api_token", token);
+            ApiHelper.WriteSuccess("API token generated", new { token });
+        }
+
+        // Disable token auth by clearing the stored secret.
+        static void ClearApiToken()
+        {
+            Db.SaveSetting("api_token", "");
+            ApiHelper.WriteSuccess("API token cleared");
+        }
+
+        // A URL-safe, ~43-char random token (256 bits, base64url without padding).
+        static string NewToken()
+        {
+            byte[] buf = new byte[32];
+            using (var rng = System.Security.Cryptography.RandomNumberGenerator.Create())
+                rng.GetBytes(buf);
+            return Convert.ToBase64String(buf)
+                .Replace('+', '-').Replace('/', '_').TrimEnd('=');
         }
     }
 }

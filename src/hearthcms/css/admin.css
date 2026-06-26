@@ -1656,3 +1656,88 @@ select, .editor-type-select {
 .data-table .col-check input {
     cursor: pointer;
 }
+
+/* ============================================================
+   User management (/admin/users) - pills, link-style cell button,
+   and the add/edit popup dialog.
+   ============================================================ */
+.pill {
+    display: inline-block;
+    padding: 2px 9px;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.6;
+    border-radius: 999px;
+    background: var(--bg);
+    color: var(--text-soft);
+    border: 1px solid var(--border);
+}
+.pill-muted {
+    background: transparent;
+    color: var(--text-mute);
+    border-color: var(--border);
+}
+
+/* A button styled to read like the table's title link. */
+.linklike {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    color: var(--text);
+    font-weight: 600;
+    cursor: pointer;
+}
+.linklike:hover {
+    text-decoration: underline;
+}
+
+/* ----- dialog ----- */
+.user-dialog-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 60px 16px 24px;
+    background: rgba(0, 0, 0, .42);
+    overflow-y: auto;
+}
+body.user-dialog-open {
+    overflow: hidden;
+}
+.user-dialog {
+    width: 100%;
+    max-width: 460px;
+    background: var(--card, #fff);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    animation: userDialogIn .14s ease-out;
+}
+@keyframes userDialogIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.user-dialog-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--border);
+}
+.user-dialog-head h2 {
+    margin: 0;
+    font-size: 17px;
+    color: var(--text);
+}
+.user-dialog-body {
+    padding: 18px;
+}
+.user-dialog-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 22px;
+}

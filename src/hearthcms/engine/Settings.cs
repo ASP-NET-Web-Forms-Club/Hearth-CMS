@@ -69,6 +69,29 @@
         public static string HomePageMode { get { return Db.GetSetting("home_page_mode", "0"); } }
         public static int    HomePageId   { get { return GetInt("home_page_id", 0); } }
 
+        // ===== Dev / Testing =====
+        // When IsDevMode is true the request pipeline auto-logs the admin user
+        // so admin pages are reachable without going through the login screen.
+        //
+        // Default is OFF: a fresh/seeded install requires a normal login. Toggle
+        // it from the admin Settings page (the "Dev / Testing" section). Stored
+        // as the "dev_mode" setting ("1" = on).
+        public static bool IsDevMode { get { return Db.GetSetting("dev_mode", "0") == "1"; } }
+
+        // ===== API access token =====
+        // An optional shared secret that authorises API calls WITHOUT a login
+        // session - intended for automated/unattended posting (migration tools,
+        // scripts, an AI agent over MCP). When set, a request may present this
+        // exact string (via the X-Api-Token header, or an api_token query/form
+        // field) and AdminGuard.RequireLoginApi() will accept it.
+        //
+        // Empty means "disabled": no token auth is possible (the blank value can
+        // never be matched), and only a real login (or Dev Mode) works. Generate
+        // / clear it from the admin Settings page.
+        public static string ApiToken { get { return (Db.GetSetting("api_token", "") ?? "").Trim(); } }
+
+        public static bool ApiTokenEnabled { get { return ApiToken.Length > 0; } }
+
         // ----- Active theme ----- (validated + defaulted by ThemeManager)
         public static string ActiveTheme { get { return ThemeManager.GetActiveSlug(); } }
 

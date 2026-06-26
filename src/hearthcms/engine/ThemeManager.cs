@@ -18,7 +18,11 @@ namespace System.engine
     {
         // The reference theme shipped with the CMS; used as the render
         // fallback and protected from deletion.
-        public const string BuiltinSlug = "hearth";
+        //
+        // NOTE: this is the *preferred* default slug. The actual fallback used
+        // by GetActiveSlug() is whatever DefaultSlug() resolves to at runtime,
+        // which is guaranteed to be a theme that actually exists (folder or C#).
+        public const string BuiltinSlug = "hearth-cs";
         public const int MaxSlugLength = 64;
 
         // Filename-safe: latin letters, digits, dash, underscore. 1-64 chars.
@@ -68,10 +72,77 @@ namespace System.engine
         }
 
         // ===== Active theme =====
+        // Returns the slug the public site should render with. This is the single
+        // choke point every render path funnels through, so the guarantee made
+        // here - "the returned slug always resolves to a theme that exists" -
+        // protects the whole public pipeline from the blank-page failure that
+        // happens when active_theme points at a missing/deleted theme.
+        //
+        // Resolution order:
+        //   1. The configured active_theme, IF it is format-valid AND actually
+        //      exists as a folder theme or a C# (code) theme.
+        //   2. Otherwise DefaultSlug() - the CMS default, which is itself
+        //      existence-checked so we never hand back a dead slug.
         public static string GetActiveSlug()
         {
             string slug = Db.GetSetting("active_theme", BuiltinSlug);
-            return IsValidSlug(slug) ? slug : BuiltinSlug;
+            if (IsValidSlug(slug) && ThemeExists(slug)) return slug;
+            return DefaultSlug();
+        }
+
+        // True when `slug` resolves to an installed theme: either a folder theme
+        // (a directory under App_Data/themes/) or a C# theme class in the
+        // registry. Format must be valid first.
+        public static bool ThemeExists(string slug)
+        {
+            if (!IsValidSlug(slug)) return false;
+            try
+            {
+                string dir = ThemeFolder(slug);
+                if (!string.IsNullOrEmpty(dir) && Directory.Exists(dir)) return true;
+            }
+            catch { }
+            try { return CsTemplate.CsThemeRegistry.Exists(slug); }
+            catch { return false; }
+        }
+
+        // The CMS default theme slug, guaranteed to exist. Prefers the shipped
+        // C# Hearth theme (BuiltinSlug); if that is somehow absent, falls back to
+        // any C# theme, then any folder theme. Returns BuiltinSlug as a last
+        // resort so callers always get a non-empty, format-valid slug even on a
+        // misconfigured install (the template loader then surfaces a clear
+        // "template not found" rather than a silent blank page).
+        public static string DefaultSlug()
+        {
+            // 1. The preferred built-in (C# Hearth).
+            if (ThemeExists(BuiltinSlug)) return BuiltinSlug;
+
+            // 2. Any installed C# theme.
+            try
+            {
+                var cs = CsTemplate.CsThemeRegistry.All();
+                if (cs != null && cs.Count > 0 && !string.IsNullOrEmpty(cs[0].Slug))
+                    return cs[0].Slug;
+            }
+            catch { }
+
+            // 3. Any folder theme.
+            try
+            {
+                string root = ThemesRoot;
+                if (!string.IsNullOrEmpty(root) && Directory.Exists(root))
+                {
+                    foreach (string dir in Directory.GetDirectories(root))
+                    {
+                        string s = Path.GetFileName(dir);
+                        if (IsValidSlug(s)) return s;
+                    }
+                }
+            }
+            catch { }
+
+            // 4. Last resort.
+            return BuiltinSlug;
         }
 
         public static bool Activate(string slug)

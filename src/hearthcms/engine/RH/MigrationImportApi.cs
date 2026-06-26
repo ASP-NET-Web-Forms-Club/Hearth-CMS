@@ -17,7 +17,7 @@ namespace System.engine.RH
     // That lets the tool rewrite the article's image URLs to their final
     // Hearth paths before (or independently of) the actual upload.
     //
-    // Auth: same as the rest of the admin APIs. When Config.IsDevMode is
+    // Auth: same as the rest of the admin APIs. When Settings.IsDevMode is
     // true, AdminGuard.RequireLoginApi() auto-logs the first admin, so the
     // migration tool needs no credentials in a local/dev run.
     //
@@ -105,7 +105,7 @@ namespace System.engine.RH
                 // web-served /media tree, so we must never accept executable or
                 // script types (e.g. .aspx, .ashx, .config, .php). Restrict to
                 // the image types the migration actually moves. Combined with
-                // Config.IsDevMode auto-login, an un-whitelisted endpoint on a
+                // Settings.IsDevMode auto-login, an un-whitelisted endpoint on a
                 // public instance would let any visitor drop arbitrary files.
                 if (!IsAllowedImageExt(ext))
                 {

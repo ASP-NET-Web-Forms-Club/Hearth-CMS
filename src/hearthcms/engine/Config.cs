@@ -5,18 +5,13 @@ namespace System.engine
 {
     public static class Config
     {
-        // ===== Dev / Testing =====
-        // When IsDevMode is true the request pipeline auto-logs the admin user
-        // so admin pages are reachable without going through the login screen.
-        public static bool IsDevMode = true;
-
         // ===== Site identity (overridden by Settings table after load) =====
         public static string SiteName = "Hearth CMS";
         public static string SiteTagline = "A clean place to write.";
         public static string AdminBrand = "CMS Admin";
 
         // ===== Paths =====
-        public static string DbFileName = "cms.sqlite";
+        public static string DbFileName = "hearth-cms.sqlite";
         public static string UploadsFolderRelative = "/uploads/";
 
         // ===== Computed =====

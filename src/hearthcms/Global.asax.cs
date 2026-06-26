@@ -130,7 +130,7 @@ namespace System
             }
             else if (AdminSlug.IsHiddenDefaultPath(path) && !AppSession.IsLoggedIn)
             {
-                NotFoundPage.HandleRequest();
+                Render404();
                 return;
             }
 
@@ -185,6 +185,8 @@ namespace System
                     AdminMediaApi.HandleRequest(); return;
                 case "/api/admin/settings":
                     AdminSettingsApi.HandleRequest(); return;
+                case "/api/admin/users":
+                    AdminUserApi.HandleRequest(); return;
                 case "/api/admin/nav":
                     AdminNavBuilder.HandleApiRequest(); return;
                 case "/api/admin/themes":
@@ -224,6 +226,8 @@ namespace System
                     AdminThemeDocsCSharp.HandleRequest(); return;
                 case "/admin/settings":
                     AdminSettings.HandleRequest(); return;
+                case "/admin/users":
+                    AdminUser.HandleRequest(); return;
                 case "/admin/nav":
                     AdminNavBuilder.HandleRequest(); return;
                 case "/admin/guidelines":
@@ -285,6 +289,28 @@ namespace System
 
             // Fallthrough: 404 for app routes, but leave .html/.js/.css etc. to IIS.
             if (HasFileExtension(rawPath)) return;
+
+            Render404();
+        }
+
+        // Render a 404 through the active C# theme's shell when one is active
+        // (its HandleNotFound sets status 404, renders inside the theme, and ends
+        // the response). Falls back to the folder-theme NotFoundPage otherwise.
+        //
+        // This MUST be used for every 404 site-wide: NotFoundPage renders via the
+        // folder-template engine (_layout.html / 404.html), which a C# theme has
+        // no files for - calling it directly under a C# theme yields a blank page.
+        static void Render404()
+        {
+            try
+            {
+                if (CsThemeRegistry.IsActiveCsTemplate)
+                {
+                    var theme = CsThemeRegistry.Active;
+                    if (theme != null) { theme.HandleNotFound(); return; }
+                }
+            }
+            catch { /* fall back to the folder-theme 404 below */ }
 
             NotFoundPage.HandleRequest();
         }

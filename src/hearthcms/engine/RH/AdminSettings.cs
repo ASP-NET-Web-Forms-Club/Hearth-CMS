@@ -64,6 +64,11 @@ namespace System.engine.RH
             string homeMode = Settings.HomePageMode;
             if (homeMode != "1" && homeMode != "2" && homeMode != "3" && homeMode != "4") homeMode = "0";
 
+            bool devMode = Settings.IsDevMode;
+
+            string apiToken = Settings.ApiToken;
+            bool apiTokenSet = apiToken.Length > 0;
+
             // Admin URL slug: the live, resolved value plus whether config.txt is
             // currently pinning it (in which case the field is read-only).
             string adminSlug = AdminSlug.Current;
@@ -332,6 +337,54 @@ namespace System.engine.RH
         </div>
     </div>
 
+    <div class='card'>
+        <div class='card-header'><h2><i class='fa-solid fa-flask'></i> Dev / Testing</h2></div>
+        <div class='card-body'>
+            <label class='switch'>
+                <input type='checkbox' name='dev_mode' {(devMode ? "checked" : "")} />
+                <span>Enable Dev Mode</span>
+            </label>
+            <p class='form-hint' style='margin-top:10px'>
+                When Dev Mode is on, the request pipeline <strong>auto-logs the admin user</strong>,
+                so admin pages are reachable without going through the login screen. This is meant
+                for local development and testing only.
+            </p>
+            <p class='form-hint' style='color:var(--warn,#d97706);margin-top:8px'>
+                <i class='fa-solid fa-triangle-exclamation'></i> <strong>Do not enable this on a public site.</strong>
+                With Dev Mode on, anyone reaching an admin URL is signed in as the first admin account
+                with no password.
+            </p>
+        </div>
+    </div>
+
+    <div class='card'>
+        <div class='card-header'><h2><i class='fa-solid fa-key'></i> API access token</h2></div>
+        <div class='card-body'>
+            <p class='form-hint' style='margin-top:0'>
+                A shared secret that lets external tools call the API <strong>without a login</strong> &mdash;
+                for migration scripts, automation, or an AI agent posting over MCP. Send it as the
+                <code>X-Api-Token</code> request header, or as an <code>api_token</code> query-string or form field.
+                See <a href='/admin/guidelines'>General Guidelines</a> for the full import protocol.
+            </p>
+            <div class='form-field'>
+                <label for='api_token_box'>Current token</label>
+                <div style='display:flex;gap:8px;align-items:center'>
+                    <input type='text' id='api_token_box' value='{HttpUtility.HtmlAttributeEncode(apiToken)}' readonly placeholder='(no token set &mdash; token access is disabled)' style='flex:1;font-family:monospace' onclick='this.select()' />
+                    <button type='button' class='btn btn-ghost' onclick='copyApiToken()'><i class='fa-solid fa-copy'></i> Copy</button>
+                </div>
+                <p class='form-hint'>{(apiTokenSet ? "Token access is <strong>enabled</strong>. Treat this string like a password." : "No token is set, so token access is <strong>disabled</strong>. Generate one to enable it.")}</p>
+            </div>
+            <div style='display:flex;gap:8px;flex-wrap:wrap'>
+                <button type='button' class='btn btn-primary btn-sm' onclick='generateApiToken()'><i class='fa-solid fa-rotate'></i> {(apiTokenSet ? "Regenerate token" : "Generate token")}</button>
+                <button type='button' class='btn btn-ghost btn-sm' onclick='clearApiToken()' {(apiTokenSet ? "" : "disabled")}><i class='fa-solid fa-ban'></i> Clear (disable)</button>
+            </div>
+            <p class='form-hint' style='color:var(--warn,#d97706);margin-top:10px'>
+                <i class='fa-solid fa-triangle-exclamation'></i> Regenerating <strong>immediately invalidates the old token</strong>;
+                update anything that uses it. Anyone holding this token can create and modify content as the admin.
+            </p>
+        </div>
+    </div>
+
     <div class='settings-actions'>
         <button type='submit' class='btn btn-primary'><i class='fa-solid fa-floppy-disk'></i> Save settings</button>
     </div>
@@ -372,6 +425,45 @@ async function clearCacheNow() {{
         if (d.success) flashGoodAndReload('Cache cleared', 'Cache has been cleared.');
         else showErrorMessage('Failed', d.message);
     }} catch (ex) {{ showErrorMessage('Network error', 'Please try again.'); }}
+}}
+async function generateApiToken() {{
+    if (document.getElementById('api_token_box').value &&
+        !confirm('Regenerate the API token? The current token will stop working immediately.')) return;
+    var fd = new FormData();
+    fd.append('action', 'generate-api-token');
+    try {{
+        var r = await fetch('/api/admin/settings', {{ method: 'POST', body: fd }});
+        var d = await r.json();
+        if (d.success && d.data && d.data.token) {{
+            // Reload so the box, hints and button states reflect the new token
+            // (which is now saved). The token is shown in the box after reload.
+            flashGoodAndReload('Token generated', 'Copy your new token from the API access section.');
+        }} else showErrorMessage('Failed', d.message || 'Could not generate token.');
+    }} catch (ex) {{ showErrorMessage('Network error', 'Please try again.'); }}
+}}
+async function clearApiToken() {{
+    if (!confirm('Clear the API token? Token-based API access will be disabled until you generate a new one.')) return;
+    var fd = new FormData();
+    fd.append('action', 'clear-api-token');
+    try {{
+        var r = await fetch('/api/admin/settings', {{ method: 'POST', body: fd }});
+        var d = await r.json();
+        if (d.success) flashGoodAndReload('Token cleared', 'Token access disabled.');
+        else showErrorMessage('Failed', d.message);
+    }} catch (ex) {{ showErrorMessage('Network error', 'Please try again.'); }}
+}}
+function copyApiToken() {{
+    var box = document.getElementById('api_token_box');
+    if (!box.value) {{ showErrorMessage('Nothing to copy', 'Generate a token first.'); return; }}
+    box.select();
+    var done = function() {{ showGoodMessage('Copied', 'Token copied to clipboard.'); }};
+    if (navigator.clipboard && navigator.clipboard.writeText) {{
+        navigator.clipboard.writeText(box.value).then(done, function() {{
+            try {{ document.execCommand('copy'); done(); }} catch (e) {{ showErrorMessage('Copy failed', 'Select and copy manually.'); }}
+        }});
+    }} else {{
+        try {{ document.execCommand('copy'); done(); }} catch (e) {{ showErrorMessage('Copy failed', 'Select and copy manually.'); }}
+    }}
 }}
 async function generateSitemapNow() {{
     var fd = new FormData();

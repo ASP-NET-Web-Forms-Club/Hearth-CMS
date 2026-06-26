@@ -514,7 +514,7 @@ namespace System.engine
             SetIfMissing(s, "categories_post_count", "6");
             SetIfMissing(s, "category_post_count", "6");
             SetIfMissing(s, "article_sidebar_post_count", "6");
-            SetIfMissing(s, "active_theme", "hearth");
+            SetIfMissing(s, "active_theme", "hearth-cs");
             SetIfMissing(s, "cache_ram_enabled", "1");
             SetIfMissing(s, "cache_file_enabled", "0");
             SetIfMissing(s, "cache_ram_max_mb", "250");

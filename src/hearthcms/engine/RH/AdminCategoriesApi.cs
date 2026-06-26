@@ -16,6 +16,7 @@ namespace System.engine.RH
             {
                 switch (action)
                 {
+                    case "list": List(); break;
                     case "save": Save(); break;
                     case "delete": Delete(); break;
                     default: ApiHelper.WriteError("Unknown action: " + action); break;
@@ -26,6 +27,50 @@ namespace System.engine.RH
                 ApiHelper.WriteError(ex.Message, 500);
             }
             ApiHelper.EndResponse();
+        }
+
+        // GET-style read: every category with the fields a migration/automation
+        // client needs to resolve a post's category_id (especially id + slug +
+        // name), plus a published-post count per category. Ordered the same way
+        // the admin list and public pages order them (sort_order, then name).
+        static void List()
+        {
+            List<obCategory> cats = CategoryManager.GetAll();
+
+            // Published, non-deleted post counts per category id (one query).
+            var counts = new Dictionary<int, int>();
+            using (var conn = new SQLiteConnection(Config.GetConnString()))
+            {
+                conn.Open();
+                using (var cmd = conn.CreateCommand())
+                {
+                    var s = new SQLiteExpress(cmd);
+                    var rows = s.GetObjectList<obSetting>(
+                        "SELECT category_id AS skey, COUNT(*) AS svalue FROM posts WHERE category_id <> 0 AND is_deleted=0 GROUP BY category_id;");
+                    foreach (var r in rows)
+                    {
+                        int cid = 0; int.TryParse(r.Skey + "", out cid);
+                        int c = 0; int.TryParse(r.Svalue + "", out c);
+                        if (cid > 0) counts[cid] = c;
+                    }
+                }
+            }
+
+            var list = new List<object>();
+            foreach (var c in cats)
+            {
+                list.Add(new
+                {
+                    id = c.Id,
+                    name = c.Name,
+                    slug = c.Slug,
+                    description = c.Description,
+                    sort_order = c.SortOrder,
+                    post_count = counts.ContainsKey(c.Id) ? counts[c.Id] : 0
+                });
+            }
+
+            ApiHelper.WriteSuccess("OK", new { count = list.Count, categories = list });
         }
 
         static void Save()
@@ -54,11 +99,25 @@ namespace System.engine.RH
                 {
                     var s = new SQLiteExpress(cmd);
 
-                    // Slug uniqueness (excluding self).
+                    // Slug uniqueness (excluding self). On conflict, return the
+                    // existing category's id so an importer can reuse it rather
+                    // than failing — this makes a re-run idempotent. Still a 400
+                    // (the save didn't happen), but the body carries existing_id.
                     var pp = new Dictionary<string, object> { { "@s", slug }, { "@id", id } };
-                    int dup = s.ExecuteScalar<int>(
-                        "SELECT COUNT(*) FROM categories WHERE slug=@s AND id<>@id;", pp);
-                    if (dup > 0) { ApiHelper.WriteError("Another category already uses that slug"); return; }
+                    var clash = s.GetObject<obCategory>(
+                        "SELECT * FROM categories WHERE slug=@s AND id<>@id LIMIT 1;", pp);
+                    if (clash != null && clash.Id > 0)
+                    {
+                        ApiHelper.WriteJson(new
+                        {
+                            success = false,
+                            message = "Another category already uses that slug",
+                            existing_id = clash.Id,
+                            existing_slug = clash.Slug,
+                            existing_name = clash.Name
+                        });
+                        return;
+                    }
 
                     var d = new Dictionary<string, object>();
                     d["slug"] = slug;
