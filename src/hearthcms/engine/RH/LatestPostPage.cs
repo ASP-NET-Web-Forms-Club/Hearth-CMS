@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data.SQLite;
 using System.engine;
 using System.engine.RH;
-using System.Linq;
+
 using System.Text;
 using System.Web;
 
@@ -27,9 +27,12 @@ namespace System.engine.RH
         public static void HandleRequest()
         {
             string q = (HttpContext.Current.Request.QueryString["q"] + "").Trim();
-            int limit = HomeLayoutShared.CountFor("latest_post_count");
+            int perPage = HomeLayoutShared.CountFor("latest_post_count");
+            int page = HomeLayoutShared.PageParam();
 
             List<obPost> posts;
+            int total = 0;
+            int totalPages = 1;
             try
             {
                 using (var conn = new SQLiteConnection(Config.GetConnString()))
@@ -38,9 +41,15 @@ namespace System.engine.RH
                     using (var cmd = conn.CreateCommand())
                     {
                         var s = new SQLiteExpress(cmd);
+                        total = string.IsNullOrEmpty(q)
+                            ? HomeLayoutShared.CountAll(s)
+                            : HomeLayoutShared.CountSearch(s, q, 0);
+                        totalPages = HomeLayoutShared.TotalPages(total, perPage);
+                        if (page > totalPages) page = totalPages;
+                        int offset = (page - 1) * perPage;
                         posts = string.IsNullOrEmpty(q)
-                            ? HomeLayoutShared.Latest(s, limit)
-                            : HomeLayoutShared.Search(s, q, 0, limit);
+                            ? HomeLayoutShared.LatestPaged(s, perPage, offset)
+                            : HomeLayoutShared.SearchPaged(s, q, 0, perPage, offset);
                     }
                 }
             }
@@ -56,8 +65,9 @@ namespace System.engine.RH
             m.SetRaw("search_bar", HomeLayoutShared.SearchBar("/latest-post", q));
             m.SetRaw("search_meta", string.IsNullOrEmpty(q)
                 ? ""
-                : $"<p class='search-meta'>{posts.Count} result(s) for “{HttpUtility.HtmlEncode(q)}” · <a href='/latest-post'>Clear</a></p>");
+                : $"<p class='search-meta'>{total} result(s) for “{HttpUtility.HtmlEncode(q)}” · <a href='/latest-post'>Clear</a></p>");
             m.SetRaw("row_list", HomeLayoutShared.RowListTemplated(themeSlug, posts, true, CategoryManager.GetMap()));
+            m.SetRaw("pagination", HomeLayoutShared.PaginationTemplated(themeSlug, "/latest-post", q, page, totalPages));
 
             string body = TemplateEngine.Render(themeSlug, "latest-post.html", m);
             PublicPageCache.WriteAndCache(pt.RenderPage(body));

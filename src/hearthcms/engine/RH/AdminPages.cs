@@ -16,8 +16,20 @@ namespace System.engine.RH
                 (HttpContext.Current.Request.QueryString["filter"] + "").Trim(),
                 "deleted", StringComparison.OrdinalIgnoreCase);
 
+            // Optional search term (?q=...). When present the list is filtered by
+            // title / slug / excerpt / content; the Active/Deleted counts stay
+            // unscoped so the tabs always show the full totals.
+            string q = AdminListSearch.Term();
+            bool searching = q.Length > 0;
+
+            // Page size (?per=, default 50, remembered server-side in a cookie)
+            // and current page (?page=). The list is sliced with LIMIT/OFFSET.
+            int perPage = AdminListSearch.PerPage(50);
+            int page = AdminListSearch.PageNum();
+
             List<obPage> lst = new List<obPage>();
             int activeCount = 0, deletedCount = 0;
+            int total = 0, totalPages = 1;
             using (var conn = new SQLiteConnection(Config.GetConnString()))
             {
                 conn.Open();
@@ -26,9 +38,26 @@ namespace System.engine.RH
                     var s = new SQLiteExpress(cmd);
                     activeCount = s.ExecuteScalar<int>("SELECT COUNT(*) FROM pages WHERE is_deleted=0;");
                     deletedCount = s.ExecuteScalar<int>("SELECT COUNT(*) FROM pages WHERE is_deleted=1;");
+
+                    string where = "is_deleted=" + (showDeleted ? "1" : "0");
+                    var prm = new Dictionary<string, object>();
+                    if (searching)
+                    {
+                        where += " AND (title LIKE @q OR slug LIKE @q OR excerpt LIKE @q OR content LIKE @q)";
+                        prm["@q"] = "%" + q + "%";
+                    }
+
+                    // Total for the current view+search drives the page count.
+                    total = s.ExecuteScalar<int>("SELECT COUNT(*) FROM pages WHERE " + where + ";", prm);
+                    totalPages = AdminListSearch.TotalPages(total, perPage);
+                    if (page > totalPages) page = totalPages;
+                    int offset = (page - 1) * perPage;
+                    prm["@lim"] = perPage;
+                    prm["@off"] = offset;
+
                     lst = s.GetObjectList<obPage>(
-                        "SELECT * FROM pages WHERE is_deleted=" + (showDeleted ? "1" : "0") +
-                        " ORDER BY sort_order, title;");
+                        "SELECT * FROM pages WHERE " + where +
+                        " ORDER BY sort_order, title LIMIT @lim OFFSET @off;", prm);
                 }
             }
 
@@ -45,9 +74,25 @@ namespace System.engine.RH
 
             sb.Append(AdminTrashUi.FilterTabs("/admin/pages", showDeleted, activeCount, deletedCount));
 
+            // Show the search box whenever the current view has something to
+            // search, or a search is already active (so it can be cleared).
+            int viewCount = showDeleted ? deletedCount : activeCount;
+            if (viewCount > 0 || searching)
+                sb.Append(AdminListSearch.SearchBar("/admin/pages", q, showDeleted, "Search pages by title, slug or content…"));
+
             if (lst.Count == 0)
             {
-                if (showDeleted)
+                if (searching)
+                {
+                    sb.Append(@"
+<div class='empty-card empty-card-sm'>
+    <i class='fa-solid fa-magnifying-glass empty-icon'></i>
+    <h2>No matching pages</h2>
+    <p>No pages match your search. Try a different term.</p>
+</div>
+");
+                }
+                else if (showDeleted)
                 {
                     sb.Append(@"
 <div class='empty-card empty-card-sm'>
@@ -71,7 +116,9 @@ namespace System.engine.RH
             }
             else
             {
+                if (searching) sb.Append(AdminListSearch.ResultMeta(lst.Count, q));
                 sb.Append(AdminTrashUi.BulkBar("page", showDeleted));
+                sb.Append(AdminListSearch.PaginationBar("/admin/pages", q, showDeleted, perPage, page, totalPages, total, true));
 
                 sb.Append(@"
 <div class='data-table-wrap'>
@@ -123,6 +170,7 @@ namespace System.engine.RH
 </table>
 </div>
 ");
+                sb.Append(AdminListSearch.PaginationBar("/admin/pages", q, showDeleted, perPage, page, totalPages, total, false));
                 sb.Append(AdminTrashUi.Script("page", "/api/admin/pages"));
             }
             sb.Append(tpl.RenderFooter());

@@ -325,5 +325,149 @@ namespace System.engine.RH
             }
             return sb.ToString();
         }
+
+        // ============================================================
+        // Pagination - shared by the HTML-theme listing handler
+        // (LatestPostPage) and, via these internal helpers, by the C#
+        // theme base (CsTemplate). The page slice is LIMIT/OFFSET over the
+        // same published-post query the non-paged listing uses; the page
+        // chrome is stamped from the theme's pagination-block components.
+        // ============================================================
+
+        // Current 1-based page from ?page=N (defaults to 1, never < 1).
+        public static int PageParam()
+        {
+            int page;
+            if (!int.TryParse((HttpContext.Current.Request.QueryString["page"] + ""), out page)) page = 1;
+            if (page < 1) page = 1;
+            return page;
+        }
+
+        // Page count for a row total at a given page size (always >= 1).
+        public static int TotalPages(int total, int perPage)
+        {
+            if (perPage < 1) perPage = 1;
+            if (total <= 0) return 1;
+            return (total + perPage - 1) / perPage;
+        }
+
+        // Total published, non-deleted posts (the pagination denominator).
+        public static int CountAll(SQLiteExpress s)
+        {
+            return s.ExecuteScalar<int>(
+                "SELECT COUNT(*) FROM posts WHERE is_published=1 AND is_deleted=0;",
+                new Dictionary<string, object>());
+        }
+
+        // Total posts matching a search (categoryId > 0 scopes it).
+        public static int CountSearch(SQLiteExpress s, string q, int categoryId)
+        {
+            string like = "%" + q + "%";
+            var p = new Dictionary<string, object> { { "@q", like } };
+            string scope = "";
+            if (categoryId > 0) { scope = " AND category_id=@cat"; p["@cat"] = categoryId; }
+            return s.ExecuteScalar<int>(
+                "SELECT COUNT(*) FROM posts WHERE is_published=1 AND is_deleted=0" + scope +
+                " AND (title LIKE @q OR excerpt LIKE @q OR content LIKE @q);", p);
+        }
+
+        // One page of the latest list: newest first, LIMIT/OFFSET.
+        public static List<obPost> LatestPaged(SQLiteExpress s, int limit, int offset)
+        {
+            var p = new Dictionary<string, object> { { "@lim", limit }, { "@off", offset } };
+            return s.GetObjectList<obPost>(
+                "SELECT * FROM posts WHERE is_published=1 AND is_deleted=0 ORDER BY date_published DESC LIMIT @lim OFFSET @off;", p);
+        }
+
+        // One page of search results: same relevance ordering as Search(), paged.
+        public static List<obPost> SearchPaged(SQLiteExpress s, string q, int categoryId, int limit, int offset)
+        {
+            string like = "%" + q + "%";
+            var p = new Dictionary<string, object> { { "@q", like }, { "@lim", limit }, { "@off", offset } };
+            string scope = "";
+            if (categoryId > 0) { scope = " AND category_id=@cat"; p["@cat"] = categoryId; }
+            string sql =
+                "SELECT * FROM posts WHERE is_published=1 AND is_deleted=0" + scope + " AND (" +
+                "  title LIKE @q OR excerpt LIKE @q OR content LIKE @q" +
+                ") ORDER BY " +
+                "  CASE WHEN title    LIKE @q THEN 0 ELSE 1 END, " +
+                "  CASE WHEN excerpt  LIKE @q THEN 0 ELSE 1 END, " +
+                "  CASE WHEN content  LIKE @q THEN 0 ELSE 1 END, " +
+                "  date_published DESC LIMIT @lim OFFSET @off;";
+            return s.GetObjectList<obPost>(sql, p);
+        }
+
+        // The page numbers to render, with 0 marking an ellipsis gap. Always
+        // shows the first & last page plus a window of one either side of the
+        // current page.
+        public static List<int> PageWindow(int current, int total)
+        {
+            var pages = new List<int>();
+            if (total <= 1) return pages;
+            const int edge = 1;
+            const int around = 1;
+            int last = 0;
+            for (int i = 1; i <= total; i++)
+            {
+                bool show = i <= edge || i > total - edge ||
+                            (i >= current - around && i <= current + around);
+                if (!show) continue;
+                if (last > 0 && i - last > 1) pages.Add(0);
+                pages.Add(i);
+                last = i;
+            }
+            return pages;
+        }
+
+        // Build a listing URL for a page, preserving an active search. Page 1
+        // omits the page param so the canonical URL stays clean.
+        public static string PageUrl(string basePath, string q, int page)
+        {
+            var sb = new StringBuilder(basePath);
+            char sep = '?';
+            if (!string.IsNullOrEmpty(q))
+            {
+                sb.Append(sep).Append("q=").Append(HttpUtility.UrlEncode(q));
+                sep = '&';
+            }
+            if (page > 1) sb.Append(sep).Append("page=").Append(page);
+            return sb.ToString();
+        }
+
+        // The pagination control for an HTML theme, stamped from
+        // components/pagination-block.html + pagination-block-item.html.
+        // Returns "" when there is a single page (nothing to show).
+        public static string PaginationTemplated(string themeSlug, string basePath, string q, int currentPage, int totalPages)
+        {
+            if (totalPages <= 1) return "";
+
+            string itemTpl = TemplateEngine.Load(themeSlug, "components/pagination-block-item.html");
+            var items = new StringBuilder();
+            foreach (int pg in PageWindow(currentPage, totalPages))
+            {
+                if (pg == 0)
+                {
+                    items.Append("<span class='pagination-gap'>&hellip;</span>");
+                    continue;
+                }
+                var im = new TemplateModel();
+                im.SetAttr("page_url", PageUrl(basePath, q, pg));
+                im.SetText("page_number", pg.ToString());
+                im.SetRaw("page_active", pg == currentPage ? " is-active" : "");
+                items.Append(im.Render(itemTpl));
+            }
+
+            int prev = currentPage <= 1 ? 1 : currentPage - 1;
+            int next = currentPage >= totalPages ? totalPages : currentPage + 1;
+
+            var m = new TemplateModel();
+            m.SetAttr("prev_url", PageUrl(basePath, q, prev));
+            m.SetRaw("prev_disabled", currentPage <= 1 ? " is-disabled" : "");
+            m.SetAttr("next_url", PageUrl(basePath, q, next));
+            m.SetRaw("next_disabled", currentPage >= totalPages ? " is-disabled" : "");
+            m.SetRaw("pagination_items", items.ToString());
+            m.SetText("pagination_info", "Page " + currentPage + " of " + totalPages);
+            return TemplateEngine.Render(themeSlug, "components/pagination-block.html", m);
+        }
     }
 }

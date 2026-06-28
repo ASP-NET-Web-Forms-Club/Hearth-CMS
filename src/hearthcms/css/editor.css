@@ -450,8 +450,8 @@
     width: 100% !important;
     padding: 15px !important;
     /* height = 520px - 30px padding top bottom */
-    height: 520px !important;
-    max-height: 520px !important;
+    height: 70vh !important;
+    max-height: 70vh !important;
     border: 0 !important;
     outline: none !important;
     line-height: 1.55 !important;
@@ -466,7 +466,7 @@
 }
 .md-preview-frame {
     width: 100%;
-    height: 520px;
+    height: 70vh;
     border: 0;
     display: block;
     background: #fff;

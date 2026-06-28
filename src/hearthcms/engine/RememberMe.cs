@@ -13,10 +13,19 @@ namespace System.engine
     // by deleting the row.
     public static class RememberMe
     {
-        public const string CookieName = "rmt";
+        // Base cookie name; the actual name is port-scoped via CookieScope so
+        // multiple instances on the same host (different ports) don't share one
+        // remember-me cookie. See CookieScope for the rationale.
+        public const string BaseCookieName = "rmt";
+        public static string CookieName { get { return CookieScope.Name(BaseCookieName); } }
         const int SelectorBytes = 12;
         const int ValidatorBytes = 32;
         const int DefaultDays = 30;
+        // How long the just-rotated (previous) validator stays acceptable, so a
+        // burst of concurrent requests carrying the same pre-rotation cookie all
+        // authenticate instead of tripping theft detection. See TryRestore.
+        const int GraceSeconds = 30;
+        static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
         public static void Issue(int userId)
         {
@@ -84,11 +93,14 @@ namespace System.engine
                     var s = new SQLiteExpress(cmd);
                     var p = new Dictionary<string, object> { { "@s", selector } };
                     var dt = s.Select(
-                        "SELECT id, validator_hash, user_id, expires_at FROM user_sessions WHERE selector=@s LIMIT 1;", p);
+                        "SELECT id, validator_hash, prev_validator_hash, rotated_unix, user_id, expires_at FROM user_sessions WHERE selector=@s LIMIT 1;", p);
                     if (dt == null || dt.Rows.Count == 0) { ClearCookie(); return; }
                     var r = dt.Rows[0];
                     int rowId = Convert.ToInt32(r["id"]);
                     string storedHash = r["validator_hash"] as string ?? "";
+                    string prevHash = r["prev_validator_hash"] as string ?? "";
+                    long rotatedUnix = (r["rotated_unix"] == null || r["rotated_unix"] is DBNull)
+                        ? 0L : Convert.ToInt64(r["rotated_unix"]);
                     int userId = Convert.ToInt32(r["user_id"]);
                     DateTime expires = Convert.ToDateTime(r["expires_at"]);
 
@@ -104,9 +116,26 @@ namespace System.engine
                     try { presented = FromHex(validator); }
                     catch { ClearCookie(); return; }
                     string presentedHash = Sha256Hex(presented);
-                    if (!ConstantTimeEquals(presentedHash, storedHash))
+
+                    bool isCurrent = ConstantTimeEquals(presentedHash, storedHash);
+                    // Grace window: also accept the immediately-PREVIOUS validator for
+                    // a few seconds after it was rotated out. When a browser reopens
+                    // and restores several admin tabs at once, all the requests carry
+                    // the same not-yet-rotated cookie and arrive together; the first to
+                    // be served rotates the token, and without this window every other
+                    // concurrent request would present the now-superseded validator and
+                    // be misread as a stolen cookie - deleting the row and logging the
+                    // user out for good. Genuine theft (an old cookie replayed long
+                    // after rotation) still falls outside the window and is caught.
+                    bool isPrevGrace = !isCurrent
+                        && prevHash.Length > 0
+                        && ConstantTimeEquals(presentedHash, prevHash)
+                        && (NowUnix() - rotatedUnix) <= GraceSeconds;
+
+                    if (!isCurrent && !isPrevGrace)
                     {
-                        // Mismatch likely means a stolen-cookie attempt; nuke the row.
+                        // Matches neither the current token nor a just-superseded one:
+                        // treat as a stolen/forged cookie and revoke the session.
                         var pp = new Dictionary<string, object> { { "@i", rowId } };
                         s.Execute("DELETE FROM user_sessions WHERE id=@i;", pp);
                         ClearCookie();
@@ -123,25 +152,43 @@ namespace System.engine
                         return;
                     }
 
-                    byte[] newValidatorBytes = RandomBytes(ValidatorBytes);
-                    string newValidator = ToHex(newValidatorBytes);
-                    string newHash = Sha256Hex(newValidatorBytes);
-                    DateTime newExpires = DateTime.UtcNow.AddDays(DefaultDays);
-                    var pr = new Dictionary<string, object>
+                    // Rotate ONLY when the current validator was presented, and do it
+                    // as an atomic compare-and-swap on the validator we just read
+                    // (WHERE ... AND validator_hash=@cur). Of N concurrent requests
+                    // exactly one wins the swap (changes()==1) and re-issues the
+                    // cookie; the losers (changes()==0) were rotated out a moment ago
+                    // and simply ride the grace window above, leaving the winner's
+                    // fresh cookie untouched so the client converges on one token.
+                    if (isCurrent)
                     {
-                        { "@h", newHash },
-                        { "@e", newExpires },
-                        { "@i", rowId }
-                    };
-                    s.Execute("UPDATE user_sessions SET validator_hash=@h, expires_at=@e WHERE id=@i;", pr);
-
-                    var c = new HttpCookie(CookieName, selector + "." + newValidator);
-                    c.HttpOnly = true;
-                    c.Secure = ctx.Request.IsSecureConnection;
-                    c.SameSite = SameSiteMode.Lax;
-                    c.Path = "/";
-                    c.Expires = newExpires;
-                    ctx.Response.Cookies.Set(c);
+                        byte[] newValidatorBytes = RandomBytes(ValidatorBytes);
+                        string newValidator = ToHex(newValidatorBytes);
+                        string newHash = Sha256Hex(newValidatorBytes);
+                        DateTime newExpires = DateTime.UtcNow.AddDays(DefaultDays);
+                        var pr = new Dictionary<string, object>
+                        {
+                            { "@h", newHash },
+                            { "@ph", storedHash },
+                            { "@ru", NowUnix() },
+                            { "@e", newExpires },
+                            { "@i", rowId },
+                            { "@cur", storedHash }
+                        };
+                        s.Execute("UPDATE user_sessions SET validator_hash=@h, prev_validator_hash=@ph, rotated_unix=@ru, expires_at=@e WHERE id=@i AND validator_hash=@cur;", pr);
+                        long changed = s.ExecuteScalar<long>("SELECT changes();");
+                        if (changed == 1)
+                        {
+                            var c = new HttpCookie(CookieName, selector + "." + newValidator);
+                            c.HttpOnly = true;
+                            c.Secure = ctx.Request.IsSecureConnection;
+                            c.SameSite = SameSiteMode.Lax;
+                            c.Path = "/";
+                            c.Expires = newExpires;
+                            ctx.Response.Cookies.Set(c);
+                        }
+                        // changed == 0: a concurrent request already rotated this row;
+                        // do not reissue - that request's cookie is the live one.
+                    }
                 }
             }
 
@@ -185,6 +232,14 @@ namespace System.engine
             c.Expires = DateTime.UtcNow.AddDays(-1);
             c.Path = "/";
             ctx.Response.Cookies.Set(c);
+        }
+
+        // Current time as whole seconds since the Unix epoch. Stored/compared as an
+        // integer so the grace-window math is immune to the DateTime-kind/timezone
+        // quirks of how SQLite round-trips DATETIME columns.
+        static long NowUnix()
+        {
+            return (long)(DateTime.UtcNow - UnixEpoch).TotalSeconds;
         }
 
         static byte[] RandomBytes(int n)

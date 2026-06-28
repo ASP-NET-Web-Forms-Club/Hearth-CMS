@@ -31,13 +31,22 @@ namespace System.engine.CsTemplate.Hearth
         public override string Url { get { return "Github Hearth CMS"; } }
         public override string Version { get { return "1"; } }
 
+        // Stylesheet the live <head> links (see Layout.RenderHeader) - exposed so
+        // the admin Markdown preview loads the same CSS instead of the folder-theme
+        // default (/assets/themes/{slug}/style.css), which this theme does not ship.
+        public override string CssHref { get { return AssetBase + "/hearth.css"; } }
+
         // Shared layout factory: title suffixed with the site name, plus the
         // theme's asset base so CSS/JS resolve to /assets/themes/hearth-cs/.
         Layout NewLayout(string pageTitle)
         {
             string site = GetSiteName();
             string title = string.IsNullOrEmpty(pageTitle) ? site : pageTitle + " - " + site;
-            return new Layout { Title = title, MetaDescription = "", AssetBaseUrl = AssetBase };
+            // Default the meta description to the site's SEO Description (admin
+            // Settings -> "Description (SEO)") so listing/home/page routes are not
+            // emitted with an empty <meta name='description'>. Handlers with a more
+            // specific description (e.g. a post's excerpt) override it afterwards.
+            return new Layout { Title = title, MetaDescription = GetSiteDescription(), AssetBaseUrl = AssetBase };
         }
     }
 }

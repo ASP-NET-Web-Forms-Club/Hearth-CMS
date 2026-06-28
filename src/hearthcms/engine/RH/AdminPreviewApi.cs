@@ -2,6 +2,7 @@
 using System.Text;
 using System.Web;
 using System.engine.Markdown;
+using System.engine.CsTemplate;
 
 namespace System.engine.RH
 {
@@ -91,7 +92,53 @@ namespace System.engine.RH
             }
 
             string body = MarkdownToHtml.ToHtml(entry.Markdown ?? "");
+
+            // Folder/HTML themes: render the content through the SAME pipeline a real
+            // published page uses - the theme's article template wrapped in its
+            // _layout.html - so the preview inherits the designer's COMPLETE <head>
+            // (every stylesheet, web font and highlight.js theme), not just a single
+            // CSS file we tried to guess. C# (code) themes have no reusable HTML
+            // templates, so they keep the self-contained wrapper below. Any failure
+            // (missing/broken theme templates) falls back to that wrapper too, so the
+            // preview always shows the converted HTML rather than an error page.
+            bool isCsTheme = CsThemeRegistry.IsActiveCsTemplate && CsThemeRegistry.Active != null;
+            if (!isCsTheme && TryWriteTemplatedPreview(body)) return;
+
             WritePreviewHtml(body);
+        }
+
+        // Render the preview body through the active folder theme's real page
+        // template (article-full-width.html + _layout.html). Returns false on any
+        // failure so the caller can fall back to the self-contained wrapper.
+        static bool TryWriteTemplatedPreview(string bodyHtml)
+        {
+            try
+            {
+                var model = new DocModel
+                {
+                    Title = "Preview",
+                    Layout = "stack",     // full-width, no "recent posts" aside
+                    ShowAside = false,
+                    RenderedContentHtml = bodyHtml
+                };
+                string page = new PublicTemplate
+                {
+                    Title = "Preview",
+                    BodyClass = "page-doc"
+                }.RenderPage(DocLayout.RenderTemplated(model));
+
+                if (string.IsNullOrEmpty(page)) return false;
+
+                var ctx = HttpContext.Current;
+                ctx.Response.ContentType = "text/html; charset=utf-8";
+                ctx.Response.Cache.SetCacheability(HttpCacheability.NoCache);
+                ctx.Response.Write(page);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         static void WritePreviewHtml(string bodyHtml)
@@ -108,8 +155,18 @@ namespace System.engine.RH
             // keyed off those classes (backgrounds, container widths) apply. We
             // deliberately skip site-header, nav-overlay, and site-footer -
             // chrome the editor doesn't need to preview.
+            // Resolve the active theme's real stylesheet URL. A C# (code) theme
+            // ships its own bundled CSS (e.g. broadsheet-cs.css) and does NOT
+            // publish a {slug}/style.css, so the folder-theme convention 404s and
+            // the preview renders unstyled. Use the active theme's declared CssHref
+            // in that case; fall back to the folder convention for HTML themes.
             string activeThemeSlug = ThemeManager.GetActiveSlug();
-            string themeHref = ThemeManager.CssPublicUrl(activeThemeSlug);
+            string themeHref;
+            if (CsThemeRegistry.IsActiveCsTemplate && CsThemeRegistry.Active != null)
+                themeHref = CsThemeRegistry.Active.CssHref;
+            else
+                themeHref = ThemeManager.ResolveCssPublicUrl(activeThemeSlug)
+                            ?? ThemeManager.CssPublicUrl(activeThemeSlug);
 
             var sb = new StringBuilder();
             sb.Append(@"<!DOCTYPE html>

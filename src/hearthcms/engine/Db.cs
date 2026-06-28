@@ -27,6 +27,14 @@ namespace System.engine
             // Example (kept as documentation of the format; already present in
             // CreateSchema, guarded, so harmless if it ever runs on an old DB):
             // { 1, "ALTER TABLE posts ADD COLUMN category TEXT NOT NULL DEFAULT '';" },
+
+            // 1-2: remember-me grace window. The previous validator hash plus the
+            // time it was superseded let TryRestore tolerate the just-rotated token
+            // for a few seconds, so concurrent requests from one client (a browser
+            // restoring several admin tabs at once, all carrying the not-yet-rotated
+            // cookie) are not misread as token theft. See RememberMe.TryRestore.
+            { 1, "ALTER TABLE user_sessions ADD COLUMN prev_validator_hash TEXT NOT NULL DEFAULT '';" },
+            { 2, "ALTER TABLE user_sessions ADD COLUMN rotated_unix INTEGER NOT NULL DEFAULT 0;" },
         };
 
         // The version a freshly-created database is stamped with: the largest key
@@ -408,6 +416,8 @@ namespace System.engine
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     selector TEXT NOT NULL UNIQUE,
                     validator_hash TEXT NOT NULL,
+                    prev_validator_hash TEXT NOT NULL DEFAULT '',
+                    rotated_unix INTEGER NOT NULL DEFAULT 0,
                     user_id INTEGER NOT NULL,
                     expires_at DATETIME NOT NULL,
                     date_created DATETIME NOT NULL

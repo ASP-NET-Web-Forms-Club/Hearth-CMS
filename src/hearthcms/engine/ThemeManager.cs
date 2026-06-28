@@ -58,6 +58,41 @@ namespace System.engine
         public static string CssPublicUrl(string slug) { return "/assets/themes/" + slug + "/style.css"; }
         public static string JsPublicUrl(string slug) { return "/assets/themes/" + slug + "/script.js"; }
 
+        // Resolve the public URL of a folder theme's primary stylesheet. Folder
+        // themes ship their CSS under their own name (e.g. almanac.css), not the
+        // legacy "style.css", so the fixed CssPublicUrl() 404s for them - which is
+        // why the admin Markdown preview rendered unstyled. Probe the theme's asset
+        // folder in order of confidence:
+        //   1. style.css            - the legacy/"site" convention (EnsureAssetFiles)
+        //   2. {slug}.css           - the naming convention every shipped folder theme uses
+        //   3. the first *.css file  - last-resort for a custom filename
+        // Returns null when the theme folder has no stylesheet at all, so callers
+        // can fall back to CssPublicUrl().
+        public static string ResolveCssPublicUrl(string slug)
+        {
+            try
+            {
+                string folder = AssetFolder(slug);
+                if (string.IsNullOrEmpty(folder) || !Directory.Exists(folder)) return null;
+
+                if (File.Exists(Path.Combine(folder, "style.css")))
+                    return "/assets/themes/" + slug + "/style.css";
+
+                string conv = (slug ?? "").ToLowerInvariant() + ".css";
+                string[] cssFiles = Directory.GetFiles(folder, "*.css");
+                foreach (string f in cssFiles)
+                {
+                    if (string.Equals(Path.GetFileName(f), conv, StringComparison.OrdinalIgnoreCase))
+                        return "/assets/themes/" + slug + "/" + Path.GetFileName(f);
+                }
+
+                if (cssFiles.Length > 0)
+                    return "/assets/themes/" + slug + "/" + Path.GetFileName(cssFiles[0]);
+            }
+            catch { }
+            return null;
+        }
+
         public static bool HasThemeJs(string slug)
         {
             try { return File.Exists(AssetJsPath(slug)); }

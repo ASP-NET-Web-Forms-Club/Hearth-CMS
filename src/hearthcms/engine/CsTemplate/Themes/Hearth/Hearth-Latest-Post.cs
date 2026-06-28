@@ -13,19 +13,28 @@ namespace System.engine.CsTemplate.Hearth
         public override void HandleLatestPost()
         {
             string q = (HttpContext.Current.Request.QueryString["q"] + "").Trim();
-            int limit = GetCountSetting("latest_post_count");
+            int perPage = GetCountSetting("latest_post_count");
+            int page = PageParam();
 
-            // Data via the CsTemplate helpers - no direct SQLite in theme code.
+            // Total + page slice via the CsTemplate helpers - no direct SQLite.
+            int total = string.IsNullOrEmpty(q)
+                ? GetPublishedPostCount()
+                : SearchPostsCount(q, 0);
+            int totalPages = TotalPages(total, perPage);
+            if (page > totalPages) page = totalPages;
+            int offset = (page - 1) * perPage;
+
             List<obPost> posts = string.IsNullOrEmpty(q)
-                ? GetRecentPost(limit)
-                : SearchPosts(q, 0, limit);
+                ? GetRecentPostPaged(perPage, offset)
+                : SearchPostsPaged(q, 0, perPage, offset);
 
             string subheading = string.IsNullOrEmpty(q)
                 ? "<p class='list-sub'>Fresh writing, newest first.</p>" : "";
             string searchMeta = string.IsNullOrEmpty(q)
                 ? ""
                 : string.Format("<p class='search-meta'>{0} result(s) for &ldquo;{1}&rdquo; &middot; <a href='/latest-post'>Clear</a></p>",
-                    posts.Count, H(q));
+                    total, H(q));
+            string pagination = RenderPagination("/latest-post", q, page, totalPages);
 
             var layout = NewLayout("Latest posts");
             var sb = new StringBuilder();
@@ -40,12 +49,14 @@ namespace System.engine.CsTemplate.Hearth
         {1}
         {2}
         {3}
+        {4}
     </div>
 </section>",
                 subheading,
                 RenderSearchBar("/latest-post", q),
                 searchMeta,
-                RenderRowList(posts, true)));
+                RenderRowList(posts, true),
+                pagination));
             sb.Append(layout.RenderFooter());
             WriteCached(sb.ToString());
         }

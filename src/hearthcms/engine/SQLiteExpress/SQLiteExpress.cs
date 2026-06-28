@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
+
 using System.Text;
 using System.Globalization;
 using System.Reflection;
@@ -331,7 +331,11 @@ namespace System.Data.SQLite
         /// <param name="lst">List of same class object</param>
         public void SaveList<T>(string table, IEnumerable<T> lst)
         {
-            if (lst.Count() == 0)
+            // Grab the first element (and bail on an empty sequence) without LINQ.
+            T first = default(T);
+            bool any = false;
+            foreach (var item in lst) { first = item; any = true; break; }
+            if (!any)
                 return;
 
             table = Escape(table);
@@ -345,8 +349,8 @@ namespace System.Data.SQLite
                 lstCol.Add(dr["name"] + "");
             }
 
-            var fields = lst.ElementAt(0).GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
-            var properties = lst.ElementAt(0).GetType().GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+            var fields = first.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+            var properties = first.GetType().GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
 
             foreach (var s in lst)
             {
@@ -557,7 +561,12 @@ namespace System.Data.SQLite
 
                 foreach (var kv in dic)
                 {
-                    if (!lstCols.Contains(kv.Key))
+                    bool found = false;
+                    foreach (var c in lstCols)
+                    {
+                        if (c == kv.Key) { found = true; break; }
+                    }
+                    if (!found)
                     {
                         lstup.Add(kv.Key);
                     }

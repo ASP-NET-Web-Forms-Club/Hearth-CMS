@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data.SQLite;
+using System.Text;
 using System.Web;
 using System.engine.RH;
 
@@ -72,6 +73,13 @@ namespace System.engine.CsTemplate
         // Public URL of this theme's asset folder, e.g. "/assets/themes/hearth".
         // Build links like AssetBase + "/style.css".
         protected string AssetBase { get { return "/assets/themes/" + Slug; } }
+
+        // Public URL of the stylesheet the live <head> links for this theme. The
+        // admin Markdown preview uses this so its iframe is styled identically to
+        // the published page. The default follows the folder-theme convention
+        // ({AssetBase}/style.css); each C# theme overrides it with the bundled CSS
+        // file its own Layout links (e.g. broadsheet-cs.css, hearth.css).
+        public virtual string CssHref { get { return AssetBase + "/style.css"; } }
 
         // Emit the finished HTML through the public page cache (RAM/file tiers),
         // caching under the current request path - the sanctioned output path.
@@ -378,6 +386,120 @@ namespace System.engine.CsTemplate
         public string RenderCategorySection(obCategory cat, List<obPost> posts)
         {
             return HomeLayoutShared.CategorySection(cat, posts);
+        }
+
+        // ============================================================
+        // Pagination - page through the full published-post set instead of
+        // capping at N. The per-listing count setting (e.g. latest_post_count)
+        // becomes the page size; ?page=N selects the slice. These wrap the same
+        // internal helpers the HTML-theme path uses, so both engines page
+        // identically. RenderPagination builds the control as code (the C#
+        // parallel to the HTML theme's pagination-block components) using the
+        // same CSS class hooks, so one stylesheet block covers both paths.
+        // ============================================================
+
+        // Current 1-based page from ?page=N (defaults to 1).
+        public int PageParam()
+        {
+            return HomeLayoutShared.PageParam();
+        }
+
+        // Page count for a row total at a given page size (always >= 1).
+        public int TotalPages(int total, int perPage)
+        {
+            return HomeLayoutShared.TotalPages(total, perPage);
+        }
+
+        // Total published, non-deleted posts (the pagination denominator).
+        public int GetPublishedPostCount()
+        {
+            try
+            {
+                return WithDb(delegate (SQLiteExpress s)
+                {
+                    return HomeLayoutShared.CountAll(s);
+                });
+            }
+            catch { return 0; }
+        }
+
+        // Total posts matching a search (categoryId > 0 scopes it).
+        public int SearchPostsCount(string q, int categoryId)
+        {
+            try
+            {
+                return WithDb(delegate (SQLiteExpress s)
+                {
+                    return HomeLayoutShared.CountSearch(s, q, categoryId);
+                });
+            }
+            catch { return 0; }
+        }
+
+        // One page of the latest posts (page size = perPage, slice = offset).
+        public List<obPost> GetRecentPostPaged(int perPage, int offset)
+        {
+            try
+            {
+                return WithDb(delegate (SQLiteExpress s)
+                {
+                    return HomeLayoutShared.LatestPaged(s, perPage, offset);
+                });
+            }
+            catch { return new List<obPost>(); }
+        }
+
+        // One page of search results (same relevance ordering as SearchPosts).
+        public List<obPost> SearchPostsPaged(string q, int categoryId, int perPage, int offset)
+        {
+            try
+            {
+                return WithDb(delegate (SQLiteExpress s)
+                {
+                    return HomeLayoutShared.SearchPaged(s, q, categoryId, perPage, offset);
+                });
+            }
+            catch { return new List<obPost>(); }
+        }
+
+        // The pagination control as code-built HTML. Same class hooks as the
+        // HTML theme's pagination-block (.pagination, .pagination-prev / -next /
+        // -page, .pagination-gap, plus is-active / is-disabled suffixes), so a
+        // single CSS block styles both paths. basePath is the listing route
+        // (e.g. "/latest-post"); q preserves an active search across pages.
+        // Returns "" for a single page.
+        public string RenderPagination(string basePath, string q, int currentPage, int totalPages)
+        {
+            if (totalPages <= 1) return "";
+
+            var sb = new StringBuilder();
+            sb.Append("<nav class='pagination' aria-label='Pagination'>");
+
+            int prev = currentPage <= 1 ? 1 : currentPage - 1;
+            sb.Append("<a class='pagination-prev" + (currentPage <= 1 ? " is-disabled" : "") +
+                "' href='" + Attr(HomeLayoutShared.PageUrl(basePath, q, prev)) + "' rel='prev'>" +
+                "<i class='fa-solid fa-arrow-left'></i> Newer</a>");
+
+            sb.Append("<span class='pagination-pages'>");
+            foreach (int pg in HomeLayoutShared.PageWindow(currentPage, totalPages))
+            {
+                if (pg == 0)
+                {
+                    sb.Append("<span class='pagination-gap'>&hellip;</span>");
+                    continue;
+                }
+                sb.Append("<a class='pagination-page" + (pg == currentPage ? " is-active" : "") +
+                    "' href='" + Attr(HomeLayoutShared.PageUrl(basePath, q, pg)) + "'>" + pg + "</a>");
+            }
+            sb.Append("</span>");
+
+            int next = currentPage >= totalPages ? totalPages : currentPage + 1;
+            sb.Append("<a class='pagination-next" + (currentPage >= totalPages ? " is-disabled" : "") +
+                "' href='" + Attr(HomeLayoutShared.PageUrl(basePath, q, next)) + "' rel='next'>" +
+                "Older <i class='fa-solid fa-arrow-right'></i></a>");
+
+            sb.Append("</nav>");
+            return sb.ToString();
         }
     }
 }

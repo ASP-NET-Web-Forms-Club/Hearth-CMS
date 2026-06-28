@@ -355,6 +355,10 @@
     <Content Include="App_Data\themes\Victoria\home.html" />
     <Content Include="App_Data\themes\Victoria\latest-post.html" />
     <Content Include="App_Data\themes\Victoria\_layout.html" />
+    <Content Include="assets\default\hearth-cms-logo.png" />
+    <Content Include="assets\default\hearth-cms-logo_656x656.png" />
+    <Content Include="assets\default\hearth-logo-250x250.png" />
+    <Content Include="assets\default\hearth.ico" />
     <Content Include="assets\themes\Almanac\almanac.css" />
     <Content Include="assets\themes\Almanac\showcase.jpg" />
     <Content Include="assets\themes\Broadsheet-cs\broadsheet-cs.css" />
@@ -442,6 +446,10 @@
     <Content Include="assets\themes\Victoria\showcase.jpg" />
     <Content Include="assets\themes\Victoria\victoria.css" />
     <Content Include="Global.asax" />
+    <Content Include="App_Data\AdminDocumentation\CSharpTemplateGuide.md" />
+    <Content Include="App_Data\AdminDocumentation\GeneralGuidelines.md" />
+    <Content Include="App_Data\AdminDocumentation\MarkdownReference.md" />
+    <Content Include="App_Data\AdminDocumentation\ThemeAuthoringGuide.md" />
     <None Include="Pageless-Architecture.txt" />
     <Content Include="Web.config" />
   </ItemGroup>
@@ -482,6 +490,7 @@
     <Compile Include="engine\FaviconGenerator.cs" />
     <Compile Include="engine\AdminSlug.cs" />
     <Compile Include="engine\SessionStore.cs" />
+    <Compile Include="engine\CookieScope.cs" />
     <Compile Include="engine\ApiHelper.cs" />
     <Compile Include="engine\Auth.cs" />
     <Compile Include="engine\RememberMe.cs" />
@@ -502,6 +511,7 @@
     <Compile Include="engine\RH\AdminCategoriesApi.cs" />
     <Compile Include="engine\RH\AdminUser.cs" />
     <Compile Include="engine\RH\AdminUserApi.cs" />
+    <Compile Include="engine\RH\AdminDocRenderer.cs" />
     <Compile Include="engine\RH\MigrationImportApi.cs" />
     <Compile Include="engine\RH\GetArticleMarkdownApi.cs" />
     <Compile Include="engine\RH\AdminThemeDocsCSharp.cs" />
@@ -529,6 +539,7 @@
     <Compile Include="engine\RH\AdminDashboard.cs" />
     <Compile Include="engine\RH\AdminPages.cs" />
     <Compile Include="engine\RH\AdminPagesApi.cs" />
+    <Compile Include="engine\RH\AdminListSearch.cs" />
     <Compile Include="engine\RH\AdminTrashUi.cs" />
     <Compile Include="engine\RH\AdminPosts.cs" />
     <Compile Include="engine\RH\AdminPostsApi.cs" />

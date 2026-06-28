@@ -73,10 +73,29 @@
         // When IsDevMode is true the request pipeline auto-logs the admin user
         // so admin pages are reachable without going through the login screen.
         //
-        // Default is OFF: a fresh/seeded install requires a normal login. Toggle
-        // it from the admin Settings page (the "Dev / Testing" section). Stored
-        // as the "dev_mode" setting ("1" = on).
-        public static bool IsDevMode { get { return Db.GetSetting("dev_mode", "0") == "1"; } }
+        // Resolution (highest wins):
+        //   1. /App_Data/config.txt -> dev_mode=true|false   (file override)
+        //   2. DB setting           -> dev_mode "1"/"0"      (Settings toggle)
+        //   3. default              -> OFF
+        //
+        // Default is OFF: a fresh/seeded install requires a normal login. The DB
+        // value is toggled from the admin Settings page ("Dev / Testing"). The
+        // config.txt override is the file-based escape hatch (same channel as the
+        // admin URL): it always wins, is read once at start-up / on /reset_app,
+        // and is intended for local development. NEVER enable it on a public site.
+        public static bool IsDevMode
+        {
+            get
+            {
+                bool? fromConfig = AdminSlug.ConfigDevMode;
+                if (fromConfig.HasValue) return fromConfig.Value;
+                return Db.GetSetting("dev_mode", "0") == "1";
+            }
+        }
+
+        // True when config.txt is currently pinning dev_mode (the Settings toggle
+        // is then informational only). Used by the admin UI to show a notice.
+        public static bool IsDevModeLockedByConfig { get { return AdminSlug.ConfigDevMode.HasValue; } }
 
         // ===== API access token =====
         // An optional shared secret that authorises API calls WITHOUT a login

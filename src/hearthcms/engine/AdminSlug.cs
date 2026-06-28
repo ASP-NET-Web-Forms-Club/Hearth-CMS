@@ -38,6 +38,24 @@ namespace System.engine
         static bool _configLoaded = false;
         static readonly object _lock = new object();
 
+        // Optional dev_mode override parsed from the SAME config.txt read.
+        //   null  -> no dev_mode line in config.txt (fall back to the DB setting)
+        //   true  -> dev_mode=true|1|on|yes  (force Dev Mode ON,  file wins)
+        //   false -> dev_mode=false|0|off|no (force Dev Mode OFF, file wins)
+        // See Settings.IsDevMode for how this composes with the DB setting.
+        static bool? _configDevMode = null;
+
+        // The dev_mode override from config.txt, or null when the file doesn't
+        // set it. Triggers a config load on first use, like Current.
+        public static bool? ConfigDevMode
+        {
+            get
+            {
+                if (!_configLoaded) LoadConfigOverride();
+                return _configDevMode;
+            }
+        }
+
         // ---------- Public resolution ----------
 
         // The effective admin slug, honoring config.txt > DB > default.
@@ -123,6 +141,7 @@ namespace System.engine
             lock (_lock)
             {
                 _configOverride = null;
+                _configDevMode = null;
                 _configLoaded = true;
                 try
                 {
@@ -142,11 +161,22 @@ namespace System.engine
                         if (key == SettingKey && IsValid(val))
                         {
                             _configOverride = val.ToLowerInvariant();
-                            break;
+                        }
+                        else if (key == "dev_mode")
+                        {
+                            // Accept the common truthy/falsy spellings; anything
+                            // unrecognized leaves the override unset (null).
+                            switch (val.ToLowerInvariant())
+                            {
+                                case "true": case "1": case "on": case "yes":
+                                    _configDevMode = true; break;
+                                case "false": case "0": case "off": case "no":
+                                    _configDevMode = false; break;
+                            }
                         }
                     }
                 }
-                catch { _configOverride = null; }
+                catch { _configOverride = null; _configDevMode = null; }
             }
         }
 

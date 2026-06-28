@@ -101,36 +101,43 @@ namespace System.engine.RH
             return $"<div class='doc-meta doc-meta-author'><i class='fa-regular fa-user'></i> {HttpUtility.HtmlEncode(author)}</div>";
         }
 
-        // Recent-posts aside. Like the other repeating pieces, this is built
-        // from external component templates (components/article-aside.html wrapper
-        // + components/rec-item.html per item); C# only fills data tokens, it emits
-        // no layout markup. The cover thumbnail is a bare <img> (or empty) in the
-        // {{post_thumb_img}} token, consistent with the list/card thumbnails.
+        // Recent-posts aside ("more in {category}" / "keep reading"). Built inline
+        // in C#, exactly like the breadcrumb/date/author helpers above - NOT from
+        // component templates. The folder themes ship no aside component (there is
+        // no components/article-aside.html or components/rec-item.html in any theme),
+        // so the previous template-based build silently produced an empty string and
+        // the sidebar never appeared. Their CSS, however, already styles this exact
+        // class structure (.doc-aside/.aside-heading/.reclist/.rec-item/...), which
+        // is the same markup the C# themes emit inline - so rendering it here makes
+        // the sidebar appear and look identical across both template systems.
         static string BuildAside(DocModel m)
         {
-            string slug = ThemeManager.GetActiveSlug();
-            string itemTpl = TemplateEngine.Load(slug, "components/rec-item.html");
+            var sb = new StringBuilder();
+            sb.Append("<aside class='doc-aside'>");
+            sb.Append("<h2 class='aside-heading'>").Append(HttpUtility.HtmlEncode(m.AsideHeading)).Append("</h2>");
+            sb.Append("<div class='reclist'>");
 
-            var items = new StringBuilder();
             foreach (var r in m.Recent)
             {
                 string thumbImg = string.IsNullOrEmpty(r.ImageUrl)
                     ? ""
-                    : $"<img src='{HttpUtility.HtmlAttributeEncode(r.ImageUrl)}' alt='' />";
+                    : "<img src='" + HttpUtility.HtmlAttributeEncode(ImageThumb.DisplayUrl(r.ImageUrl)) + "' alt='' />";
 
-                var im = new TemplateModel();
-                im.SetAttr("post_url", r.Href);
-                im.SetRaw("post_thumb_empty", string.IsNullOrEmpty(r.ImageUrl) ? " is-empty" : "");
-                im.SetRaw("post_thumb_img", thumbImg);
-                im.SetText("post_title", r.Title);
-                im.SetText("post_date", DateDisplay.Format(r.Date));
-                items.Append(im.Render(itemTpl));
+                sb.Append("<article class='rec-item'>");
+                sb.Append("<a class='rec-link' href='").Append(HttpUtility.HtmlAttributeEncode(r.Href)).Append("'>");
+                sb.Append("<span class='rec-thumb'>").Append(thumbImg).Append("</span>");
+                sb.Append("<span class='rec-body'>");
+                sb.Append("<span class='rec-title'>").Append(HttpUtility.HtmlEncode(r.Title)).Append("</span>");
+                sb.Append("<span class='rec-date'><i class='fa-regular fa-calendar'></i> ")
+                  .Append(HttpUtility.HtmlEncode(DateDisplay.Format(r.Date))).Append("</span>");
+                sb.Append("</span>");
+                sb.Append("</a>");
+                sb.Append("</article>");
             }
 
-            var wrap = new TemplateModel();
-            wrap.SetText("aside_heading", m.AsideHeading);
-            wrap.SetRaw("recent_item_list", items.ToString());
-            return TemplateEngine.Render(slug, "components/article-aside.html", wrap);
+            sb.Append("</div>");
+            sb.Append("</aside>");
+            return sb.ToString();
         }
     }
 }

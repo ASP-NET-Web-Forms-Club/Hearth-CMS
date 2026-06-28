@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
+
 using System.Reflection;
 
 namespace System.engine.CsTemplate
@@ -135,7 +135,7 @@ namespace System.engine.CsTemplate
 
                 Type[] types;
                 try { types = asm.GetTypes(); }
-                catch (ReflectionTypeLoadException ex) { types = ex.Types.Where(x => x != null).ToArray(); }
+                catch (ReflectionTypeLoadException ex) { types = ex.Types; }   // may contain nulls; the loop below skips them
                 catch { continue; }
 
                 foreach (var t in types)
@@ -170,7 +170,12 @@ namespace System.engine.CsTemplate
         public static bool Exists(string slug)
         {
             if (string.IsNullOrEmpty(slug)) return false;
-            return All().Any(t => string.Equals(t.Slug, slug, StringComparison.OrdinalIgnoreCase));
+            foreach (var t in All())
+            {
+                if (t != null && string.Equals(t.Slug, slug, StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+            return false;
         }
     }
 }

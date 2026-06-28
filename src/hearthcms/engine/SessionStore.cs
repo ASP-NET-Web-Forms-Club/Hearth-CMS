@@ -41,7 +41,11 @@ namespace System.engine
 
     public static class SessionStore
     {
-        public const string CookieName = "ssid";
+        // Base cookie name; the actual name is port-scoped via CookieScope so
+        // multiple instances on the same host (different ports) don't share one
+        // cookie. See CookieScope for the rationale.
+        public const string BaseCookieName = "ssid";
+        public static string CookieName { get { return CookieScope.Name(BaseCookieName); } }
         const string CtxItemKey = "SessionStore.CurrentState";
 
         public static readonly ConcurrentDictionary<string, StateObject> Sessions =
