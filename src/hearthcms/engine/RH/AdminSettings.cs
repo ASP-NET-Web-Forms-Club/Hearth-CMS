@@ -317,8 +317,14 @@ namespace System.engine.RH
         <div class='card-body'>
             <label class='switch'>
                 <input type='checkbox' name='show_markdown_button' {(showMarkdownBtn ? "checked" : "")} />
-                <span>Show Markdown button on posts <span class='form-hint'>(renders <strong>View Content</strong> / <strong>View Markdown</strong> buttons at the top of every post's content. The rendered content shows by default; switching to Markdown fetches the raw source live from the server. Applies to all themes.)</span></span>
+                <span>Show Markdown button on posts</span>
             </label>
+            <p class='form-hint' style='margin-top:10px'>
+                Display Markdown button on posts <span class='form-hint'>(renders <strong>View Content</strong> / 
+                <strong>View Markdown</strong> buttons at the top of every post's content. 
+                The rendered content shows by default; switching to Markdown fetches the raw source live from the server. 
+                Applies to all themes.)</span>
+            </p>
         </div>
     </div>
 

@@ -4,7 +4,7 @@ using System.Text;
 
 // Markdown to HTML Parser/Converter
 // https://github.com/adriancs2/csharp-Markdown-To-Html
-// Version: 1.2
+// Version: 1.2.1
 
 namespace System.engine.Markdown
 {
