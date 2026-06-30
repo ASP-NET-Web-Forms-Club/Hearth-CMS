@@ -223,6 +223,7 @@ namespace System.engine.RH
                 Slug = post.Slug,
                 Content = post.Content,
                 ContentFormat = string.IsNullOrEmpty(post.ContentFormat) ? "html" : post.ContentFormat,
+                HasStoredFormat = !string.IsNullOrEmpty(post.ContentFormat),
                 Excerpt = post.Excerpt,
                 CoverImage = post.CoverImage,
                 CategoryId = post.CategoryId,

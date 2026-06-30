@@ -150,16 +150,18 @@
         }
 
         if (fmtSelect) {
-            // User changing the dropdown: apply the swap and remember the choice.
+            // User changing the dropdown: apply the swap immediately, but
+            // don't persist the LocalStorage preference yet — that only
+            // happens on actual save (see the form 'submit' listener below),
+            // so an abandoned/cancelled edit doesn't change the user's
+            // remembered default for next time.
             fmtSelect.addEventListener('change', function () {
-                var fmt = currentFormat();
-                applyFormat(fmt);
-                savePref(fmt);
+                applyFormat(currentFormat());
             });
 
-            // On load: when no saved DB format exists (new item or legacy empty
-            // row), adopt the LocalStorage preference. A real DB value is left
-            // as rendered.
+            // On load: when no saved DB format exists (new item or legacy
+            // empty row), adopt the LocalStorage preference. A real DB value
+            // is left as rendered.
             if (!hasStoredFormat) {
                 var pref = readPref();
                 if (pref === 'markdown' || pref === 'html') {
@@ -167,6 +169,12 @@
                 }
             }
         }
+
+        // Persist the editor-type preference to LocalStorage only once the
+        // user actually saves, not on every dropdown change.
+        form.addEventListener('submit', function () {
+            savePref(currentFormat());
+        });
 
         // ===== Markdown tabbed Edit / Preview =====
         // The preview tab POSTs the current markdown to the API, which renders

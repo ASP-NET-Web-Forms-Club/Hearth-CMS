@@ -968,17 +968,16 @@ namespace System.engine.Markdown
             if (lines.Count > 0)
             {
                 sb.Append("<p>");
-                bool forceBreak = false;
+                string pendingSeparator = null; // null = no separator before the first line
 
                 for (int j = 0; j < lines.Count; j++)
                 {
                     string pLine = lines[j];
 
-                    // join continuation lines: explicit break -> <br>, otherwise a space
-                    if (j > 0)
-                        sb.Append(forceBreak ? "<br>" : " ");
+                    if (pendingSeparator != null)
+                        sb.Append(pendingSeparator);
 
-                    forceBreak = false;
+                    bool hardBreak = false;
 
                     // two or more trailing spaces = hard line break (CommonMark)
                     int trailingSpaces = 0;
@@ -989,7 +988,7 @@ namespace System.engine.Markdown
                     }
                     if (trailingSpaces >= 2)
                     {
-                        forceBreak = true;
+                        hardBreak = true;
                         pLine = pLine.Substring(0, pLine.Length - trailingSpaces);
                     }
 
@@ -998,14 +997,21 @@ namespace System.engine.Markdown
                     if (trimmed.Length > 0 && trimmed[trimmed.Length - 1] == '\\')
                     {
                         pLine = trimmed.Substring(0, trimmed.Length - 1);
-                        forceBreak = true; // backslash at line end forces a hard break
+                        hardBreak = true; // backslash at line end forces a hard break
                     }
 
-                    // a literal trailing <br> already provides the break for the next line
-                    if (trimmed.EndsWith("<br>") || trimmed.EndsWith("<br />") || trimmed.EndsWith("<br/>"))
-                        forceBreak = true;
+                    // a literal trailing <br> already provides the break itself (it
+                    // will be emitted verbatim by ParseInline below via HTML
+                    // passthrough) — the next line follows it with NO extra
+                    // separator, otherwise we'd double up into "<br><br>".
+                    trimmed = pLine.TrimEnd();
+                    bool endsWithLiteralBr = trimmed.EndsWith("<br>") || trimmed.EndsWith("<br />") || trimmed.EndsWith("<br/>");
 
                     sb.Append(ParseInline(pLine));
+
+                    if (endsWithLiteralBr) pendingSeparator = "";
+                    else if (hardBreak) pendingSeparator = "<br>";
+                    else pendingSeparator = " ";
                 }
                 sb.Append("</p>\n");
             }
