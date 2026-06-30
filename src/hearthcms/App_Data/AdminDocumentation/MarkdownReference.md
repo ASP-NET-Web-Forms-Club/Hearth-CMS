@@ -44,12 +44,13 @@ A backslash escapes only this set of **punctuation** characters, emitting the li
 
 ### Headings
 
-`#` through `######` (levels 1–6), and **must** be followed by a space. Trailing `#` and surrounding whitespace are stripped; content is inline-parsed.
+`#` through `######` (levels 1–6), and **must** be followed by a space. **Seven or more `#` is not a heading** — only levels 1–6 exist — so such a line renders as literal paragraph text. Trailing `#` and surrounding whitespace are stripped; content is inline-parsed.
 
 ```
 # Title          → <h1>Title</h1>
 ### Section ###  → <h3>Section</h3>
-#NoSpace         → literal text, not a heading
+####### Seven    → literal text, not a heading (7+ hashes)
+#NoSpace         → literal text, not a heading (no space after #)
 ```
 
 ### Paragraphs & line breaks

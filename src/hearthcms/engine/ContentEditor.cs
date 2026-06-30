@@ -36,7 +36,11 @@ namespace System.engine
         public string Title = "";
         public string Slug = "";
         public string Content = "";
-        public string ContentFormat = "html";   // "html" or "markdown"
+        public string ContentFormat = "markdown";   // "html" or "markdown" - default when no stored value
+        // True only when this value came from a real saved DB row. When false (new
+        // item, or legacy row with empty content_format), the client falls back to
+        // the LocalStorage preference. Precedence: DB > LocalStorage > Default.
+        public bool HasStoredFormat = false;
         public string Excerpt = "";
         public string CoverImage = "";
         public int CategoryId = 0;
@@ -73,7 +77,11 @@ namespace System.engine
                 ExtraFooterText =
                     "<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js'></script>\n" +
                     "<script src='/js/media-browser.js'></script>\n" +
-                    "<script src='/js/editor.js'></script>\n"
+                    "<script src='/js/editor.js'></script>\n" +
+                    // Loaded last so its dependencies (editor.js, media-browser.js)
+                    // are present. Reads the window.HEARTH_EDITOR config emitted in
+                    // the body. See engine/ContentEditor.cs JS section.
+                    "<script src='/js/editor-page.js'></script>\n"
             };
 
             var sb = new StringBuilder();
@@ -149,7 +157,7 @@ namespace System.engine
                     </div>
                     <div class='md-tab-panel' data-md-panel='preview'>
                         <div class='md-preview-status' id='md-preview-status'>Loading preview…</div>
-                        <iframe id='md-preview-frame' class='md-preview-frame' title='Markdown preview' sandbox='allow-same-origin allow-scripts'></iframe>
+                        <iframe id='md-preview-frame' class='md-preview-frame' title='Markdown preview'></iframe>
                     </div>
                 </div>
             </div>
@@ -283,205 +291,24 @@ namespace System.engine
 ");
 
             // ===== JS =====
-            // The save handler is generic: it iterates every checkbox in the form
-            // and normalizes its value to "1"/"0" - works for is_published, show_in_nav,
-            // and any future toggle without code changes here.
+            // The page logic lives in the static /js/editor-page.js (registered in
+            // ExtraFooterText, loaded after its deps). Here we emit only the
+            // per-request dynamic values, as a window.HEARTH_EDITOR config that is
+            // defined in the body - i.e. BEFORE the footer scripts run.
+            //   hasStoredFormat -> editor-type precedence (DB > LocalStorage > Default)
+            //   apiUrl          -> save endpoint (POST)
+            //   listUrl         -> back-to-list URL after a successful save
             string apiUrlJs = HttpUtility.JavaScriptStringEncode(cfg.ApiUrl);
             string listUrlJs = HttpUtility.JavaScriptStringEncode(cfg.ListUrl);
-
-            sb.Append(@"
-<script>
-(function() {
-    var titleEl = document.getElementById('title');
-    var slugEl = document.getElementById('slug');
-    var slugPreviewEl = document.getElementById('slugPreview');
-
-    function slugify(s) {
-        return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-    }
-    titleEl.addEventListener('input', function() {
-        if (!slugEl.dataset.touched) {
-            var s = slugify(this.value);
-            slugEl.value = s;
-            if (slugPreviewEl) slugPreviewEl.textContent = s;
-        }
-    });
-    slugEl.addEventListener('input', function() {
-        this.dataset.touched = '1';
-        if (slugPreviewEl) slugPreviewEl.textContent = this.value;
-    });
-");
-
-            if (cfg.ShowCoverImage)
-            {
-                sb.Append(@"
-    var coverInput = document.getElementById('cover_image');
-    if (coverInput) {
-        coverInput.addEventListener('input', function() {
-            var v = this.value.trim();
-            var box = document.getElementById('coverPreview');
-            if (!box) return;
-            if (v) { box.style.display = ''; box.querySelector('img').src = v; }
-            else { box.style.display = 'none'; }
-        });
-    }
-    window.pickCover = async function() {
-        if (window.mediaBrowser && typeof window.mediaBrowser.pick === 'function') {
-            try {
-                var picked = await window.mediaBrowser.pick({ accept: ['image/*'] });
-                if (picked) {
-                    var el = document.getElementById('cover_image');
-                    el.value = picked.trim();
-                    el.dispatchEvent(new Event('input'));
-                }
-            } catch (e) { console.error('Media picker error:', e); }
-        } else {
-            var url = prompt('Paste an image URL (e.g. /uploads/photo.jpg):');
-            if (url) {
-                var el2 = document.getElementById('cover_image');
-                el2.value = url.trim();
-                el2.dispatchEvent(new Event('input'));
-            }
-        }
-    };
-");
-            }
+            string hasStoredFormatJs = cfg.HasStoredFormat ? "true" : "false";
 
             sb.Append($@"
-    // ===== Editor type toggle =====
-    // The WYSIWYG and Markdown views share the hidden form field [name=content]
-    // via data-editor-source. We swap which input is visible and re-route content sync.
-    var fmtSelect = document.getElementById('content_format');
-    var wysiwygWrap = document.getElementById('wysiwyg-wrap');
-    var markdownWrap = document.getElementById('markdown-wrap');
-    var markdownTa = document.getElementById('markdown_content');
-    var sourceTa = document.querySelector('[data-editor-source]');
-
-    function currentFormat() {{
-        return fmtSelect ? fmtSelect.value : 'html';
-    }}
-
-    // Sync sourceTextarea (the form-bound field) from whichever editor is active.
-    function syncContentToSource() {{
-        if (!sourceTa) return;
-        if (currentFormat() === 'markdown' && markdownTa) {{
-            sourceTa.value = markdownTa.value;
-        }} else if (window.editor && typeof window.editor.getHTML === 'function') {{
-            sourceTa.value = window.editor.getHTML();
-        }} else {{
-            var fallback = document.getElementById('editor');
-            if (fallback && typeof fallback.getHTML === 'function') sourceTa.value = fallback.getHTML();
-        }}
-    }}
-
-    if (fmtSelect) {{
-        fmtSelect.addEventListener('change', function() {{
-            var fmt = currentFormat();
-            // Move the user's current content from the source field into the now-visible editor.
-            if (fmt === 'markdown') {{
-                if (markdownTa && sourceTa) markdownTa.value = sourceTa.value;
-                if (wysiwygWrap) wysiwygWrap.style.display = 'none';
-                if (markdownWrap) markdownWrap.style.display = '';
-            }} else {{
-                if (sourceTa) {{
-                    // Push markdown text back into the WYSIWYG verbatim if format flips.
-                    if (markdownTa) sourceTa.value = markdownTa.value;
-                    var ed = document.getElementById('editor');
-                    if (ed && typeof ed.setHTML === 'function') ed.setHTML(sourceTa.value);
-                }}
-                if (markdownWrap) markdownWrap.style.display = 'none';
-                if (wysiwygWrap) wysiwygWrap.style.display = '';
-            }}
-        }});
-    }}
-
-    // ===== Markdown tabbed Edit / Preview =====
-    // The preview tab POSTs the current markdown along with a one-shot token,
-    // then points the iframe at GET ?token=... which renders + removes the entry.
-    var mdTabs = document.getElementById('md-tabs');
-    if (mdTabs) {{
-        var tabBtns = mdTabs.querySelectorAll('[data-md-tab]');
-        var panels = mdTabs.querySelectorAll('[data-md-panel]');
-        var frame = document.getElementById('md-preview-frame');
-        var statusEl = document.getElementById('md-preview-status');
-
-        function activateTab(name) {{
-            tabBtns.forEach(function(b) {{
-                var on = b.dataset.mdTab === name;
-                b.classList.toggle('is-active', on);
-                b.setAttribute('aria-selected', on ? 'true' : 'false');
-            }});
-            panels.forEach(function(p) {{
-                p.classList.toggle('is-active', p.dataset.mdPanel === name);
-            }});
-        }}
-
-        function randomToken() {{
-            var b = new Uint8Array(16);
-            (window.crypto || window.msCrypto).getRandomValues(b);
-            var s = '';
-            for (var i = 0; i < b.length; i++) s += b[i].toString(16).padStart(2, '0');
-            return s;
-        }}
-
-        async function loadPreview() {{
-            if (!frame || !markdownTa) return;
-            statusEl.textContent = 'Loading preview…';
-            statusEl.style.display = '';
-            frame.style.visibility = 'hidden';
-            var token = randomToken();
-            var fd = new FormData();
-            fd.append('token', token);
-            fd.append('markdown', markdownTa.value);
-            try {{
-                var r = await fetch('/api/admin/preview-markdown', {{ method: 'POST', body: fd }});
-                var d = await r.json();
-                if (!d.success) {{
-                    statusEl.textContent = 'Preview failed: ' + (d.message || 'unknown error');
-                    return;
-                }}
-                frame.onload = function() {{
-                    statusEl.style.display = 'none';
-                    frame.style.visibility = '';
-                }};
-                frame.src = '/api/admin/preview-markdown?token=' + encodeURIComponent(token);
-            }} catch (ex) {{
-                statusEl.textContent = 'Network error loading preview.';
-            }}
-        }}
-
-        tabBtns.forEach(function(b) {{
-            b.addEventListener('click', function() {{
-                var name = this.dataset.mdTab;
-                activateTab(name);
-                if (name === 'preview') loadPreview();
-            }});
-        }});
-    }}
-
-    window.saveItem = async function(e) {{
-        e.preventDefault();
-        var form = document.getElementById('contentForm');
-        // Pull content from the currently-active editor BEFORE building FormData.
-        syncContentToSource();
-        var fd = new FormData(form);
-        fd.append('action', 'save');
-        // Normalize every checkbox to ""1""/""0"" so the server gets a clean signal.
-        form.querySelectorAll('input[type=checkbox]').forEach(function(cb) {{
-            fd.set(cb.name, cb.checked ? '1' : '0');
-        }});
-        try {{
-            var r = await fetch('{apiUrlJs}', {{ method: 'POST', body: fd }});
-            var d = await r.json();
-            if (d.success) {{
-                flashGoodAndGo('Saved', 'Changes saved.', '{listUrlJs}');
-            }} else {{
-                showErrorMessage('Save failed', d.message);
-            }}
-        }} catch (ex) {{ showErrorMessage('Network error', 'Please try again.'); }}
-        return false;
-    }};
-}})();
+<script>
+window.HEARTH_EDITOR = {{
+    hasStoredFormat: {hasStoredFormatJs},
+    apiUrl: '{apiUrlJs}',
+    listUrl: '{listUrlJs}'
+}};
 </script>
 ");
 

@@ -4,7 +4,7 @@ using System.Text;
 
 // Markdown to HTML Parser/Converter
 // https://github.com/adriancs2/csharp-Markdown-To-Html
-// Version: 1.1
+// Version: 1.2
 
 namespace System.engine.Markdown
 {
@@ -968,26 +968,42 @@ namespace System.engine.Markdown
             if (lines.Count > 0)
             {
                 sb.Append("<p>");
-                bool skipNextBreak = false;
+                bool forceBreak = false;
 
                 for (int j = 0; j < lines.Count; j++)
                 {
                     string pLine = lines[j];
 
-                    if (j > 0 && !skipNextBreak)
-                        sb.Append("<br>");
+                    // join continuation lines: explicit break -> <br>, otherwise a space
+                    if (j > 0)
+                        sb.Append(forceBreak ? "<br>" : " ");
 
-                    skipNextBreak = false;
+                    forceBreak = false;
+
+                    // two or more trailing spaces = hard line break (CommonMark)
+                    int trailingSpaces = 0;
+                    while (trailingSpaces < pLine.Length &&
+                           pLine[pLine.Length - 1 - trailingSpaces] == ' ')
+                    {
+                        trailingSpaces++;
+                    }
+                    if (trailingSpaces >= 2)
+                    {
+                        forceBreak = true;
+                        pLine = pLine.Substring(0, pLine.Length - trailingSpaces);
+                    }
 
                     // strip trailing backslash (explicit line break marker)
                     string trimmed = pLine.TrimEnd();
                     if (trimmed.Length > 0 && trimmed[trimmed.Length - 1] == '\\')
                     {
                         pLine = trimmed.Substring(0, trimmed.Length - 1);
+                        forceBreak = true; // backslash at line end forces a hard break
                     }
 
+                    // a literal trailing <br> already provides the break for the next line
                     if (trimmed.EndsWith("<br>") || trimmed.EndsWith("<br />") || trimmed.EndsWith("<br/>"))
-                        skipNextBreak = true;
+                        forceBreak = true;
 
                     sb.Append(ParseInline(pLine));
                 }
@@ -997,10 +1013,18 @@ namespace System.engine.Markdown
             return pos;
         }
 
-        /// <summary>Peek: is this a valid heading (# followed by space)?</summary>
+        /// <summary>Peek: is this a valid heading (1-6 # followed by space)?</summary>
+        /// Must mirror TryScanHeading exactly: at most 6 '#', then a space.
+        /// 7+ hashes is NOT a heading, so a paragraph must consume the line.
+        /// (If this peek and TryScanHeading ever disagree, the main loop can
+        /// livelock: TryScanHeading rejects the line without advancing, while
+        /// ScanParagraph breaks on it without advancing either.)
         static bool TryPeekHeading(string s, int pos)
         {
-            while (pos < s.Length && s[pos] == '#') pos++;
+            int start = pos;
+            while (pos < s.Length && pos - start < 6 && s[pos] == '#') pos++;
+            // Reject if a 7th '#' immediately follows (over the 6 cap).
+            if (pos < s.Length && s[pos] == '#') return false;
             return pos < s.Length && s[pos] == ' ';
         }
 
