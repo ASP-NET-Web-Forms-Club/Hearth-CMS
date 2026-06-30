@@ -5,7 +5,7 @@
 [![SQLite](https://img.shields.io/badge/SQLite-single--file-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 [![Dependencies](https://img.shields.io/badge/NuGet%20deps-2-brightgreen)](#requirements)
 [![Status](https://img.shields.io/badge/status-production%20ready-success)]()
-[![License](https://img.shields.io/badge/license-The Unlicense-lightgrey)](LICENSE)
+[![License](https://img.shields.io/badge/license-The%20Unlicense-lightgrey)](LICENSE)
 
 A lightweight, self-contained content management system built on ASP.NET (.NET Framework 4.8). All content lives in a single SQLite file — no SQL Server, no MySQL, no external services. Just two NuGet dependencies, and you install it by deploying it.
 
