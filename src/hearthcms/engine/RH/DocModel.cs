@@ -9,6 +9,7 @@ namespace System.engine.RH
     public class DocModel
     {
         public string Title = "";
+        public int PostId = 0;                    // >0 for a post (enables the markdown toggle); 0 for a page
         public string Layout = "split";          // "split" | "stack"
         public bool ShowAside = true;            // false for pages
         public string CoverImage = "";           // may be empty

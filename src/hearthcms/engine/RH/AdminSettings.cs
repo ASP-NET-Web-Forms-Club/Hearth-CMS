@@ -33,6 +33,7 @@ namespace System.engine.RH
             string categoriesCount = Settings.CategoriesPostCount.ToString();
             string categoryCount = Settings.CategoryPostCount.ToString();
             string sidebarCount = Settings.ArticleSidebarPostCount.ToString();
+            bool showMarkdownBtn = Settings.ShowMarkdownButton;
             bool ramOn = Settings.CacheRamEnabled;
             bool fileOn = Settings.CacheFileEnabled;
             int ramCount = PublicPageCache.Cache.Count;
@@ -308,6 +309,16 @@ namespace System.engine.RH
                 <button type='button' class='btn btn-ghost btn-sm' onclick='generateSitemapNow()'><i class='fa-solid fa-rotate'></i> Regenerate sitemap now</button>
                 <p class='form-hint' style='margin-top:8px'>The live sitemap auto-updates whenever you publish or edit content. Use this button only if you want to force an immediate rebuild and confirm the URL count.</p>
             </div>
+        </div>
+    </div>
+
+    <div class='card'>
+        <div class='card-header'><h2><i class='fa-solid fa-code'></i> Post content</h2></div>
+        <div class='card-body'>
+            <label class='switch'>
+                <input type='checkbox' name='show_markdown_button' {(showMarkdownBtn ? "checked" : "")} />
+                <span>Show Markdown button on posts <span class='form-hint'>(renders <strong>View Content</strong> / <strong>View Markdown</strong> buttons at the top of every post's content. The rendered content shows by default; switching to Markdown fetches the raw source live from the server. Applies to all themes.)</span></span>
+            </label>
         </div>
     </div>
 

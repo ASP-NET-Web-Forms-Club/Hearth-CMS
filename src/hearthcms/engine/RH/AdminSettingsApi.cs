@@ -15,6 +15,7 @@ namespace System.engine.RH
             "footer_col_count", "footer_col_1", "footer_col_2", "footer_col_3", "footer_col_4",
             "home_post_count", "latest_post_count", "categories_post_count",
             "category_post_count", "article_sidebar_post_count",
+            "show_markdown_button",
             "cache_ram_enabled", "cache_file_enabled", "cache_ram_max_mb",
             "home_page_mode", "home_page_id",
             "date_format",

@@ -58,7 +58,11 @@ namespace System.engine.CsTemplate.Broadsheet
             string content = m.RenderedContentHtml ?? "";
             bool hasAside = m.ShowAside && m.Recent != null && m.Recent.Count > 0;
             string aside = hasAside ? BuildAside(m) : "";
-            string contentArea = BuildContentArea(content, postId);
+            // Shared builder: ArticleTools owns the inner content (+ the View
+            // Content / View Markdown toggle for a post when the setting is on);
+            // the .doc-content.prose wrapper below is this theme's, matching the
+            // HTML themes' article-*.html so every theme renders one structure.
+            string contentArea = ArticleTools.BuildContentArea(content, postId);
 
             if (m.Layout == "stack")
             {
@@ -76,7 +80,9 @@ namespace System.engine.CsTemplate.Broadsheet
             </div>
         </header>
         {5}
-        {6}
+        <div class='doc-content prose'>
+            {6}
+        </div>
     </div>
     <div class='container'>
         {7}
@@ -100,67 +106,15 @@ namespace System.engine.CsTemplate.Broadsheet
                     </div>
                 </header>
                 {5}
-                {6}
+                <div class='doc-content prose'>
+                    {6}
+                </div>
             </div>
             {7}
         </div>
     </div>
 </article>", breadcrumbs, H(m.Title), publishedDate, updatedDate, author, coverImage, contentArea, aside);
         }
-
-        // The article body. For a post (postId > 0) the rendered HTML is wrapped in
-        // a View Content / View Markdown toggle: the HTML shows by default, and the
-        // initially-blank textarea is lazily filled from the public markdown API when
-        // the reader switches to Markdown. A page (postId == 0) gets the plain content
-        // block. The content HTML is already rendered/escaped upstream.
-        string BuildContentArea(string content, int postId)
-        {
-            if (postId <= 0)
-                return "<div class='doc-content prose'>\n" + content + "\n</div>";
-
-            var sb = new StringBuilder();
-            sb.Append(@"<div class='md-toolbar'>
-<button type='button' onclick='showContent();'>View Content</button>
-<button type='button' onclick='showMarkdown();'>View Markdown</button>
-</div>
-<div id='post_content' class='doc-content prose'>
-");
-            sb.Append(content);
-            sb.Append(@"
-</div>
-<div id='post_markdown' style='display:none'>
-<textarea readonly></textarea>
-</div>
-");
-            // Dynamic: the id this page fetches its raw markdown for.
-            sb.AppendFormat("<script>\nconst post_id = {0};\n</script>", postId);
-            // Static: the View Content / View Markdown behaviour (public API, no login).
-            sb.Append(MarkdownToggleScript);
-            return sb.ToString();
-        }
-
-        // Static toggle script — identical for every post. A plain (non-interpolated)
-        // verbatim string, so the JS braces and the `${post_id}` template literal are
-        // emitted to the browser as-is.
-        const string MarkdownToggleScript = @"<script>
-const API_ENDPOINT = `/api/get-article-markdown?id=${post_id}`;
-
-function showContent() {
-    document.getElementById('post_content').style.display = 'block';
-    document.getElementById('post_markdown').style.display = 'none';
-}
-
-function showMarkdown() {
-    document.getElementById('post_content').style.display = 'none';
-    document.getElementById('post_markdown').style.display = 'block';
-    var ta = document.querySelector('#post_markdown textarea');
-    ta.value = 'Loading...';
-    fetch(API_ENDPOINT)
-        .then(function (r) { return r.text(); })
-        .then(function (md) { ta.value = md; })
-        .catch(function () { ta.value = 'Failed to load markdown.'; });
-}
-</script>";
 
         // Breadcrumb nav. Empty when there are no crumbs.
         string BuildBreadcrumbs(List<DocCrumb> crumbs)

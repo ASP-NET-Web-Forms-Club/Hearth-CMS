@@ -11,6 +11,46 @@ Operational notes for running this site. Each section is a short how-to for a ta
 - [Markdown Documentation](/admin/markdown-docs) — the supported Markdown syntax and how each construct renders.
 - [Migrate Wordpress Into Hearth CMS](https://github.com/ASP-NET-Web-Forms-Club/Hearth-CMS/wiki/Migrate-Wordpress-Into-Hearth-CMS)
 
+## Markdown source on posts — View Content / View Markdown
+
+Every **post** can show two small buttons above its content — **View Content** and **View Markdown** — letting a reader flip between the rendered article and its raw Markdown source. The rendered content is shown by default; the Markdown is fetched **live from the server** only when the reader clicks *View Markdown*, so it never adds weight to the normal page load.
+
+This is controlled by a single switch in [Settings](/admin/settings) → **Post content** → *Show Markdown button on posts*.
+
+- **On by default.** A fresh install shows the buttons. Turn the switch off and save to remove them site-wide.
+- **Posts only.** Pages have no Markdown source endpoint, so they never get the buttons — only posts do.
+- **Every theme, one behaviour.** The switch applies to *all* themes — both HTML (token) themes and C# (code) themes. You do **not** add anything to a theme to get it; the engine injects the structure into the post body for you.
+- **Cache-safe.** Toggling the switch clears the page cache, so the change shows on the next page view.
+
+### Fixed structure — for theme designers
+
+The buttons, the content container and the Markdown box are **rendered by the engine** and are intentionally **not editable from a theme**. The markup is fixed and identical across every theme; a theme only **styles** it with CSS. When the switch is on, a post's content area is emitted as:
+
+```html
+<div class='md-toolbar'>
+    <button type='button' onclick='showContent();'>View Content</button>
+    <button type='button' onclick='showMarkdown();'>View Markdown</button>
+</div>
+<div id='post_content'>
+    <!-- the rendered article HTML -->
+</div>
+<div id='post_markdown' style='display:none'>
+    <textarea readonly></textarea>
+</div>
+<!-- plus a small script that lazily fetches the raw Markdown into the textarea -->
+```
+
+This block sits **inside** your theme's existing `.doc-content.prose` content wrapper, so your content typography still applies. To style the controls, target these hooks in your theme's CSS:
+
+| Selector | What it is |
+| --- | --- |
+| `.md-toolbar` | The row that holds the two buttons. |
+| `.md-toolbar button` | The *View Content* / *View Markdown* buttons. |
+| `#post_content` | The rendered-article container (shown by default). |
+| `#post_markdown textarea` | The raw-Markdown box (shown after clicking *View Markdown*). |
+
+The engine ships a small **theme-adaptive fallback** style for these elements (a full-width Markdown box and outlined buttons that follow your text colour), so the controls look acceptable on **every** theme out of the box — light or dark — even one that adds no CSS for them. That fallback lives in a CSS `@layer`, which means **any rule your own theme defines for the selectors above always wins over it** — so style them however you like and your rules take over completely. Bump your CSS cache-buster after editing. The raw Markdown itself comes from the public endpoint `/api/get-article-markdown?id={postId}` — the same source both engines use.
+
 ## Changing the admin login path
 
 The admin panel lives under a single URL segment. By default this is `/admin`. You can rename it to a value of your choosing — this renamed segment is called the **Hidden Admin Path**.

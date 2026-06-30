@@ -104,6 +104,7 @@ namespace System.engine.RH
             var model = new DocModel
             {
                 Title = post.Title,
+                PostId = post.Id,                // enables the markdown toggle (posts only)
                 Layout = layout,
                 ShowAside = true,
                 CoverImage = post.CoverImage,

@@ -78,7 +78,7 @@ namespace System.engine.CsTemplate.Hearth
             if (!string.IsNullOrEmpty(post.Excerpt)) layout.MetaDescription = post.Excerpt;
             var sb = new StringBuilder();
             sb.Append(layout.RenderHeader());
-            sb.Append(ArticleHtml(model));   // direct-C# article markup (mirrors article-*.html)
+            sb.Append(ArticleHtml(model, post.Id));   // direct-C# article markup (mirrors article-*.html)
             sb.Append(layout.RenderFooter());
             WriteCached(sb.ToString());
             return true;

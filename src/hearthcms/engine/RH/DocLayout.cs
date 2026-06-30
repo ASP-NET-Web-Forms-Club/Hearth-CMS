@@ -57,7 +57,10 @@ namespace System.engine.RH
                 coverModel.SetAttr("article_cover", m.CoverImage);
                 model.SetRaw("cover_image", TemplateEngine.Render(slug, "components/cover-image.html", coverModel));
             }
-            model.SetRaw("article_content", m.RenderedContentHtml ?? "");
+            // Inner content area. ArticleTools owns the "View Content / View
+            // Markdown" toggle (post + setting on); the .doc-content.prose wrapper
+            // stays in the theme's article-*.html, so no template needs editing.
+            model.SetRaw("article_content", ArticleTools.BuildContentArea(m.RenderedContentHtml, m.PostId));
             model.SetRaw("article_aside", hasAside ? BuildAside(m) : "");
 
             return TemplateEngine.Render(slug, templateName, model);

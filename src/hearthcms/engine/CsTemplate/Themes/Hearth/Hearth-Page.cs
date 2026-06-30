@@ -48,14 +48,18 @@ namespace System.engine.CsTemplate.Hearth
         // The block-or-nothing tokens (breadcrumbs, dates, author, cover,
         // aside) render a complete element when there is data, or empty.
         // ============================================================
-        string ArticleHtml(DocModel m)
+        string ArticleHtml(DocModel m, int postId = 0)
         {
             string breadcrumbs = BuildBreadcrumbs(m.Breadcrumbs);
             string publishedDate = BuildDateMeta(m.PublishedDate);
             string updatedDate = BuildDateUpdate(m.UpdatedDate);
             string author = BuildAuthor(m.Author);
             string coverImage = BuildCoverImage(m.CoverImage);
-            string content = m.RenderedContentHtml ?? "";
+            // Shared builder: inner content (+ the View Content / View Markdown
+            // toggle for a post when the setting is on). The .doc-content.prose
+            // wrapper in the template strings below is this theme's, matching the
+            // HTML themes' article-*.html so every theme renders one structure.
+            string content = ArticleTools.BuildContentArea(m.RenderedContentHtml, postId);
             bool hasAside = m.ShowAside && m.Recent != null && m.Recent.Count > 0;
             string aside = hasAside ? BuildAside(m) : "";
 

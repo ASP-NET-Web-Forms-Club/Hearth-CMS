@@ -59,6 +59,13 @@
         public static int CategoryPostCount      { get { return GetInt("category_post_count", 6); } }
         public static int ArticleSidebarPostCount { get { return GetInt("article_sidebar_post_count", 6); } }
 
+        // ----- Article display -----
+        // Show the "View Content / View Markdown" toggle at the top of a post's
+        // content area. Default ON. Applies to every theme - the HTML-template
+        // engine and the C# themes (Broadsheet, Hearth) all honour this single
+        // flag. Posts only (pages have no markdown source endpoint).
+        public static bool ShowMarkdownButton { get { return Db.GetSetting("show_markdown_button", "1") == "1"; } }
+
         // ----- Page content caching -----
         // Defaults match the install seed: RAM on, File off, 250 MB budget.
         public static bool CacheRamEnabled  { get { return Db.GetSetting("cache_ram_enabled", "1") == "1"; } }

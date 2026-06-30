@@ -526,6 +526,7 @@
     <Compile Include="engine\RH\HomePage.cs" />
     <Compile Include="engine\RH\PostPage.cs" />
     <Compile Include="engine\RH\PagePage.cs" />
+    <Compile Include="engine\RH\ArticleTools.cs" />
     <Compile Include="engine\RH\DocLayout.cs" />
     <Compile Include="engine\RH\DocCrumb.cs" />
     <Compile Include="engine\RH\DocModel.cs" />
