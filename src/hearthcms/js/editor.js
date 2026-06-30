@@ -39,8 +39,21 @@
             sel.addRange(savedRange);
         }
         function focusContent() {
+            // Capture the range BEFORE touching focus. content.focus() can
+            // collapse the selection to position 0 when content currently has
+            // no live selection (e.g. focus was in a modal's input), and that
+            // collapse can synchronously fire 'selectionchange' — which would
+            // let the global selectionchange listener clobber savedRange with
+            // the collapsed range before we get a chance to use it.
+            var range = savedRange ? savedRange.cloneRange() : null;
             content.focus();
-            restoreSelection();
+            if (range) {
+                var sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(range);
+            } else {
+                restoreSelection();
+            }
         }
         function exec(cmd, value) {
             focusContent();
@@ -136,6 +149,7 @@
                 if (action === 'link')   openLinkModal();
                 if (action === 'table')  openTableModal();
                 if (action === 'code')   openCodeModal();
+                if (action === 'inlinecode') toggleInlineCode();
                 if (action === 'source') toggleSource();
             });
         });
@@ -144,7 +158,9 @@
         function toggleSource() {
             var isSource = editor.classList.toggle('is-source');
             if (isSource) {
-                source.value = content.innerHTML;
+                source.value = (typeof formatHtml === 'function')
+                    ? formatHtml(content.innerHTML)
+                    : content.innerHTML;
                 if (status) status.textContent = 'HTML Source';
                 source.focus();
             } else {
@@ -262,29 +278,55 @@
             var text    = document.getElementById('link-text').value.trim();
             var newTab  = document.getElementById('link-newtab').checked;
             if (!url) return;
-            focusContent();
-            var html;
-            var target = newTab ? ' target="_blank" rel="noopener"' : '';
-            if (text) {
-                html = '<a href="' + escapeAttr(url) + '"' + target + '>' + escapeHtml(text) + '</a>';
-                document.execCommand('insertHTML', false, html);
-            } else {
-                var sel = window.getSelection();
-                if (sel && sel.toString()) {
-                    document.execCommand('createLink', false, url);
-                    if (newTab) {
-                        var node = sel.anchorNode;
-                        while (node && node.nodeName !== 'A') node = node.parentNode;
-                        if (node) {
-                            node.setAttribute('target', '_blank');
-                            node.setAttribute('rel', 'noopener');
-                        }
-                    }
-                } else {
-                    html = '<a href="' + escapeAttr(url) + '"' + target + '>' + escapeHtml(url) + '</a>';
-                    document.execCommand('insertHTML', false, html);
-                }
+
+            // Build the anchor element to insert.
+            var a = document.createElement('a');
+            a.setAttribute('href', url);
+            if (newTab) {
+                a.setAttribute('target', '_blank');
+                a.setAttribute('rel', 'noopener');
             }
+
+            // Capture the range BEFORE touching focus. Calling content.focus()
+            // can collapse the selection to position 0 (the editor had no live
+            // selection while the modal had focus), and that collapse fires a
+            // (sometimes synchronous) 'selectionchange' event that would
+            // otherwise let the global selectionchange listener clobber
+            // savedRange with the collapsed range before we get a chance to use it.
+            var range = savedRange ? savedRange.cloneRange() : null;
+
+            content.focus();
+            var sel = window.getSelection();
+            if (range) {
+                sel.removeAllRanges();
+                sel.addRange(range);
+            } else {
+                restoreSelection();
+            }
+
+            if (range) {
+                var selectedText = range.toString();
+                // Link text precedence: explicit "Text to display" field >
+                // the currently-selected text > the raw URL.
+                a.textContent = text || selectedText || url;
+
+                range.deleteContents();   // replace any selected text
+                range.insertNode(a);
+
+                // Place the caret immediately after the inserted link.
+                var after = document.createRange();
+                after.setStartAfter(a);
+                after.collapse(true);
+                sel.removeAllRanges();
+                sel.addRange(after);
+                savedRange = after.cloneRange();
+            } else {
+                // No known caret position - append to the end of the editor.
+                a.textContent = text || url;
+                content.appendChild(a);
+            }
+
+            updateWordCount();
             closeModal(linkModal);
         });
 
@@ -394,20 +436,231 @@
             var lang = document.getElementById('code-lang').value;
             var raw  = document.getElementById('code-content').value;
             if (!raw) return;
-            var escaped = escapeHtml(raw);
-            var html = '<pre><code class="language-' + lang + '">' + escaped + '</code></pre><p><br></p>';
-            focusContent();
-            document.execCommand('insertHTML', false, html);
-            hydrateCodeBlocks();
+
+            // Build the elements to insert directly via the DOM (not
+            // execCommand/innerHTML), so there's no browser "smart insert"
+            // behavior auto-wrapping things in a stray <div>. textContent
+            // (not innerHTML) handles HTML-escaping the code automatically.
+            var pre = document.createElement('pre');
+            var code = document.createElement('code');
+            code.className = 'language-' + lang;
+            code.textContent = raw;
+            pre.appendChild(code);
+
+            // Trailing empty paragraph: a <pre> has no "next line" the caret
+            // can land on, so this gives the user somewhere to keep typing
+            // right after the code block.
+            var trailingP = document.createElement('p');
+            trailingP.innerHTML = '<br>';
+
+            // Capture the range BEFORE touching focus — same race-condition
+            // guard as focusContent()/link-insert: content.focus() can
+            // collapse the selection and let the global selectionchange
+            // listener clobber savedRange before we get a chance to use it.
+            var range = savedRange ? savedRange.cloneRange() : null;
+            content.focus();
+            var sel = window.getSelection();
+            if (range) {
+                sel.removeAllRanges();
+                sel.addRange(range);
+            } else {
+                restoreSelection();
+            }
+
+            if (range) {
+                range.deleteContents(); // replace any selected text
+
+                // Simple text blocks are safe to split in two around the
+                // caret. Structural containers (lists, tables, etc.) are
+                // deliberately NOT split — the code block is placed right
+                // after them instead, since splitting those correctly would
+                // require much more involved DOM surgery.
+                var SPLITTABLE_TAGS = ['P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'BLOCKQUOTE'];
+                var node = range.startContainer;
+                var splitBlock = null;
+                while (node && node !== content) {
+                    if (node.nodeType === 1 && SPLITTABLE_TAGS.indexOf(node.tagName) !== -1) {
+                        splitBlock = node;
+                        break;
+                    }
+                    node = node.parentNode;
+                }
+
+                if (splitBlock) {
+                    // Split splitBlock at the caret: everything from the
+                    // caret to the end of the block moves into a clone of
+                    // it (afterBlock), and the code block is inserted
+                    // between the two halves.
+                    var afterRange = document.createRange();
+                    afterRange.setStart(range.startContainer, range.startOffset);
+                    afterRange.setEndAfter(splitBlock.lastChild || splitBlock);
+                    var afterFragment = afterRange.extractContents();
+
+                    var afterBlock = splitBlock.cloneNode(false);
+                    afterBlock.appendChild(afterFragment);
+                    if (!afterBlock.hasChildNodes()) afterBlock.innerHTML = '<br>';
+
+                    splitBlock.parentNode.insertBefore(pre, splitBlock.nextSibling);
+                    splitBlock.parentNode.insertBefore(afterBlock, pre.nextSibling);
+
+                    // If nothing was left in the original block (caret was
+                    // at its very start), drop the now-empty leftover.
+                    var leftoverEmpty = !splitBlock.hasChildNodes() ||
+                        (splitBlock.childNodes.length === 1 && splitBlock.firstChild.nodeName === 'BR');
+                    if (leftoverEmpty) splitBlock.parentNode.removeChild(splitBlock);
+
+                    var caretRange = document.createRange();
+                    caretRange.setStart(afterBlock, 0);
+                    caretRange.collapse(true);
+                    sel.removeAllRanges();
+                    sel.addRange(caretRange);
+                    savedRange = caretRange.cloneRange();
+                } else {
+                    // Caret sits directly under `content` (a bare text node,
+                    // not wrapped in any element) or inside a structural
+                    // container we don't split.
+                    var topNode = range.startContainer;
+                    while (topNode && topNode.parentNode && topNode.parentNode !== content) {
+                        topNode = topNode.parentNode;
+                    }
+
+                    var insertBefore;
+                    if (topNode && topNode.parentNode === content) {
+                        if (topNode.nodeType === 3) {
+                            // Bare text node directly under content: split it
+                            // at the caret so the code block can land inline.
+                            var offset = (range.startContainer === topNode) ? range.startOffset : topNode.length;
+                            if (offset > 0 && offset < topNode.length) {
+                                insertBefore = topNode.splitText(offset);
+                            } else {
+                                insertBefore = (offset === 0) ? topNode : topNode.nextSibling;
+                            }
+                        } else {
+                            // Structural container (list, table, div, etc.) —
+                            // insert right after it rather than splitting it.
+                            insertBefore = topNode.nextSibling;
+                        }
+                    } else {
+                        insertBefore = null; // nothing found — append at the end
+                    }
+
+                    content.insertBefore(pre, insertBefore);
+                    content.insertBefore(trailingP, insertBefore);
+
+                    var caretRange2 = document.createRange();
+                    caretRange2.setStart(trailingP, 0);
+                    caretRange2.collapse(true);
+                    sel.removeAllRanges();
+                    sel.addRange(caretRange2);
+                    savedRange = caretRange2.cloneRange();
+                }
+            } else {
+                // No known caret position — append to the end of the editor.
+                content.appendChild(pre);
+                content.appendChild(trailingP);
+            }
+
+            updateWordCount();
             closeModal(codeModal);
         });
 
         function hydrateCodeBlocks() {
-            if (typeof hljs === 'undefined') return;
-            content.querySelectorAll('pre code').forEach(function (block) {
-                block.removeAttribute('data-highlighted');
-                try { hljs.highlightElement(block); } catch (e) {}
-            });
+            // No-op: syntax highlighting is intentionally NOT applied in the
+            // editor. hljs.highlightElement() rewrites the code block's DOM
+            // (adds <span class="hljs-...">, class="... hljs", and
+            // data-highlighted="yes"), and since editor.getHTML() reads
+            // straight from content.innerHTML, that highlighting markup would
+            // get saved and shipped to the frontend as stored content.
+            // Syntax highlighting belongs on the public-facing render, not
+            // baked into the saved HTML.
+        }
+
+        // ---------- Inline code (<code>…</code>) ----------
+        // Find an inline <code> ancestor of a node, bounded by the editor root.
+        // A <code> inside a <pre> (code block) is NOT inline code, so it's excluded.
+        function inlineCodeAncestor(node) {
+            var el = node;
+            while (el && el !== content) {
+                if (el.nodeType === 1 && el.tagName === 'CODE') {
+                    if (!(el.parentNode && el.parentNode.tagName === 'PRE')) return el;
+                    return null;
+                }
+                el = el.parentNode;
+            }
+            return null;
+        }
+
+        // Replace an element with its own child nodes (unwrap), returning a range
+        // that spans what used to be inside it.
+        function unwrapElement(el) {
+            var parent = el.parentNode;
+            var range = document.createRange();
+            var first = el.firstChild;
+            var last = el.lastChild;
+            while (el.firstChild) parent.insertBefore(el.firstChild, el);
+            parent.removeChild(el);
+            if (first && last) {
+                range.setStartBefore(first);
+                range.setEndAfter(last);
+            }
+            return range;
+        }
+
+        function toggleInlineCode() {
+            content.focus();
+            restoreSelection();
+
+            var sel = window.getSelection();
+            var range = (savedRange && savedRange.cloneRange())
+                || (sel && sel.rangeCount ? sel.getRangeAt(0) : null);
+            if (!range) return;
+
+            // Toggle OFF: caret/selection sits within an existing inline <code>.
+            var existing = inlineCodeAncestor(range.startContainer)
+                || inlineCodeAncestor(range.endContainer);
+            if (existing) {
+                var unwrapped = unwrapElement(existing);
+                sel.removeAllRanges();
+                sel.addRange(unwrapped);
+                savedRange = unwrapped.cloneRange();
+                updateWordCount();
+                return;
+            }
+
+            var code = document.createElement('code');
+
+            if (range.collapsed) {
+                // No selection: insert an empty <code> and drop the caret inside,
+                // so the user can type code text immediately.
+                code.appendChild(document.createTextNode('\u200B')); // zero-width space placeholder
+                range.insertNode(code);
+                var inner = document.createRange();
+                inner.setStart(code.firstChild, code.firstChild.length);
+                inner.collapse(true);
+                sel.removeAllRanges();
+                sel.addRange(inner);
+                savedRange = inner.cloneRange();
+            } else {
+                // Wrap the current selection in <code>. extractContents preserves
+                // child nodes; we re-insert them inside the new element.
+                var frag = range.extractContents();
+                // Strip any nested <code> to avoid <code><code>… on double-wrap.
+                if (frag.querySelectorAll) {
+                    frag.querySelectorAll('code').forEach(function (c) {
+                        while (c.firstChild) c.parentNode.insertBefore(c.firstChild, c);
+                        c.parentNode.removeChild(c);
+                    });
+                }
+                code.appendChild(frag);
+                range.insertNode(code);
+                var selRange = document.createRange();
+                selRange.selectNodeContents(code);
+                sel.removeAllRanges();
+                sel.addRange(selRange);
+                savedRange = selRange.cloneRange();
+            }
+
+            updateWordCount();
         }
 
         // ---------- Paste sanitization ----------
@@ -451,7 +704,8 @@
 
         // ---------- Public API ----------
         editor.getHTML = function () {
-            return editor.classList.contains('is-source') ? source.value : content.innerHTML;
+            var raw = editor.classList.contains('is-source') ? source.value : content.innerHTML;
+            return (typeof formatHtml === 'function') ? formatHtml(raw) : raw;
         };
         editor.setHTML = function (html) {
             content.innerHTML = html || '';

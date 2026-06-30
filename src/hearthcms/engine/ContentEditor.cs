@@ -72,11 +72,10 @@ namespace System.engine
                 PageHeading = heading,
                 PageHeadingActionsHtml = viewLinkHtml,
                 ExtraHeaderText =
-                    "<link rel='stylesheet' href='/css/editor.css' />\n" +
-                    "<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css' />\n",
+                    "<link rel='stylesheet' href='/css/editor.css' />\n",
                 ExtraFooterText =
-                    "<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js'></script>\n" +
                     "<script src='/js/media-browser.js'></script>\n" +
+                    "<script src='/js/format-html.js'></script>\n" +
                     "<script src='/js/editor.js'></script>\n" +
                     // Loaded last so its dependencies (editor.js, media-browser.js)
                     // are present. Reads the window.HEARTH_EDITOR config emitted in
@@ -373,6 +372,7 @@ window.HEARTH_EDITOR = {{
             <button type='button' class='wysiwyg__btn' data-cmd='unlink' title='Remove link' aria-label='Remove link'><i class='fa-solid fa-link-slash'></i></button>
             <button type='button' class='wysiwyg__btn' data-action='image' title='Insert image' aria-label='Insert image'><i class='fa-solid fa-image'></i></button>
             <button type='button' class='wysiwyg__btn' data-action='table' title='Insert table' aria-label='Insert table'><i class='fa-solid fa-table'></i></button>
+            <button type='button' class='wysiwyg__btn' data-action='inlinecode' title='Inline code' aria-label='Inline code'><i class='fa-solid fa-terminal'></i></button>
             <button type='button' class='wysiwyg__btn' data-action='code' title='Insert code block' aria-label='Insert code block'><i class='fa-solid fa-code'></i></button>
             <button type='button' class='wysiwyg__btn' data-cmd='insertHorizontalRule' title='Horizontal rule' aria-label='Horizontal rule'><i class='fa-solid fa-minus'></i></button>
         </div>

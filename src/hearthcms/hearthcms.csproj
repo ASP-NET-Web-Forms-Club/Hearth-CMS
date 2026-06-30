@@ -452,6 +452,7 @@
     <Content Include="App_Data\AdminDocumentation\ThemeAuthoringGuide.md" />
     <None Include="Pageless-Architecture.txt" />
     <Content Include="js\editor-page.js" />
+    <Content Include="js\format-html.js" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
