@@ -298,8 +298,14 @@ namespace System.engine
         {
             entry.SizeBytes = ApproxSize(entry);
 
+            // Atomically remove any existing entry so exactly ONE thread reclaims
+            // its size, even when two stores race on the same key (miss stampede).
+            // TryGetValue + overwrite would let both racers subtract the same
+            // prev.SizeBytes, drifting _ramBytes low and breaking the budget.
+            // The brief window where the key is absent is harmless: a concurrent
+            // reader just misses and re-renders once.
             PageCache prev;
-            if (Cache.TryGetValue(path, out prev) && prev != null)
+            if (Cache.TryRemove(path, out prev) && prev != null)
                 Interlocked.Add(ref _ramBytes, -prev.SizeBytes);
 
             Cache[path] = entry;
@@ -308,14 +314,35 @@ namespace System.engine
             TrimToBudget();
         }
 
-        // Approximate in-memory footprint of an entry. Body dominates; chars are
-        // UTF-16 (2 bytes) in memory. A small fixed overhead covers the path,
-        // content-type and object headers so tiny entries still cost something.
+        // Calculates a highly accurate approximation of the entry's in-memory footprint on a 64-bit CLR.
+        // Accounts for string character data (UTF-16 chars at 2 bytes each), string object headers,
+        // the PageCache instance size, and the ConcurrentDictionary bucket node overhead.
         static long ApproxSize(PageCache e)
         {
-            long body = e.Body == null ? 0 : (long)e.Body.Length * 2;
-            long path = e.Path == null ? 0 : (long)e.Path.Length * 2;
-            return body + path + 128;
+            if (e == null) return 0;
+
+            // 1. PageCache object instance itself on 64-bit CLR: 64 bytes
+            long size = 64;
+            
+            // 2. ConcurrentDictionary internal node overhead: ~48 bytes
+            size += 48;
+            
+            // 3. Measure key string (stored in dictionary) and properties
+            size += GetStringMemorySize(e.Path);        // Dictionary key + Path property (assumes shared reference)
+            size += GetStringMemorySize(e.Body);        // HTML Body
+            size += GetStringMemorySize(e.ContentType); // ContentType string
+
+            return size;
+        }
+
+        // Helper for calculating exact C# string memory layout on 64-bit systems
+        // Align(22 + 2 * Length, 8)
+        static long GetStringMemorySize(string s)
+        {
+            if (s == null) return 0;
+            long bytes = 22 + ((long)s.Length * 2);
+            // Align to 8-byte boundary
+            return (bytes + 7) & ~7;
         }
 
         // Evicts least-recently-ACCESSED entries until the RAM total is within
