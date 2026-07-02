@@ -86,6 +86,7 @@ namespace System.engine.RH
                         d["date_created"] = DateTime.UtcNow;
                         if (datePublished == DateTime.MinValue) d["date_published"] = DateTime.UtcNow;
                         s.Insert("pages", d);
+                        id = (int)s.LastInsertId;   // surface the new id so the editor can switch to edit mode
                         AppSession.SetFlash("Page created");
                     }
                     else
@@ -96,7 +97,10 @@ namespace System.engine.RH
                     PublicPageCache.InvalidateSlug("/", slug);
                 }
             }
-            ApiHelper.WriteSuccess("Saved");
+            // Return the id (new or existing) so the editor can stay on the page
+            // and, for a freshly-created page, switch into edit mode instead of
+            // creating a duplicate on the next save.
+            ApiHelper.WriteSuccess("Saved", new { id });
         }
 
         // Parse the target id(s) from either a single "id" field or a

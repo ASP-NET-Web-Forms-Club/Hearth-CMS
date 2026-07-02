@@ -326,7 +326,22 @@
                 var r = await fetch(apiUrl, { method: 'POST', body: fd });
                 var d = await r.json();
                 if (d.success) {
-                    flashGoodAndGo('Saved', 'Changes saved.', listUrl);
+                    // Stay on the editor after saving so the author can keep working
+                    // and save milestones without being thrown back to the list.
+                    // For a brand-new item, adopt the id the server just created so
+                    // the NEXT save updates the same record (no duplicate), and
+                    // reflect the edit URL so a manual refresh reloads this item.
+                    var idField = theForm.querySelector('input[name=id]');
+                    if (idField && (!idField.value || idField.value === '0')) {
+                        var newId = d.data && d.data.id;
+                        if (newId) {
+                            idField.value = newId;
+                            if (listUrl) {
+                                try { history.replaceState(null, '', listUrl + '/edit/' + newId); } catch (e) {}
+                            }
+                        }
+                    }
+                    showGoodMessage('Saved', 'Changes saved.');
                 } else {
                     showErrorMessage('Save failed', d.message);
                 }

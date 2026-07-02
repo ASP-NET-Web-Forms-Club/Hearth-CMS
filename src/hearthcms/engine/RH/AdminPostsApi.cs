@@ -96,6 +96,7 @@ namespace System.engine.RH
                         if (datePublishedExplicit == DateTime.MinValue)
                             d["date_published"] = isPublished == 1 ? DateTime.UtcNow : DateTime.MinValue;
                         s.Insert("posts", d);
+                        id = (int)s.LastInsertId;   // surface the new id so the editor can switch to edit mode
                         AppSession.SetFlash("Post created");
                     }
                     else
@@ -124,7 +125,10 @@ namespace System.engine.RH
             // Runs as a fire-and-forget background task so the save returns fast.
             ImageThumb.QueueGenerate(cover);
 
-            ApiHelper.WriteSuccess("Saved");
+            // Return the id (new or existing) so the editor can stay on the page
+            // and, for a freshly-created post, switch into edit mode instead of
+            // creating a duplicate on the next save.
+            ApiHelper.WriteSuccess("Saved", new { id });
         }
 
         // Parse the target id(s) from either a single "id" field or a
