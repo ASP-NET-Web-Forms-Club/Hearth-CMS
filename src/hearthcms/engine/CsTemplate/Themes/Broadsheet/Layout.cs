@@ -1,7 +1,8 @@
-﻿using System.Text;
-using System.Web;
-using System.engine;
+﻿using System.engine;
 using System.engine.RH;
+using System.Runtime.Remoting.Messaging;
+using System.Text;
+using System.Web;
 
 namespace System.engine.CsTemplate.Broadsheet
 {
@@ -78,6 +79,13 @@ namespace System.engine.CsTemplate.Broadsheet
         public string RenderFooter()
         {
             string footerText = HttpUtility.HtmlEncode(Settings.FooterText);
+            string analyticScript = "";
+
+            // Internal Content Analytics: only emit the tag at all when the
+            // setting is on - when disabled, no script is included (not just a
+            // no-op script), so nothing about analytics reaches the page.
+            if (Settings.AnalyticsEnabled)
+                analyticScript = "<script src='/js/analytics.js'></script>";
 
             return $@"
 </main>
@@ -87,9 +95,12 @@ namespace System.engine.CsTemplate.Broadsheet
         <div class='footer-meta'>{footerText}</div>
     </div>
 </footer>
+
 <script src='/js/site.js'></script>
 <script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js'></script>
 <script>setTimeout(function(){{document.querySelectorAll('pre code').forEach(function(el){{try{{hljs.highlightElement(el);}}catch(e){{}}}});}},250);</script>
+{analyticScript}
+
 </body>
 </html>";
         }

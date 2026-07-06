@@ -32,6 +32,13 @@ namespace System
             // Guard 2: resolve the active C# theme (if any) at startup so the
             // first request after a recycle doesn't pay the lazy-resolve cost.
             try { CsThemeRegistry.Refresh(); } catch { }
+
+            // Resolve the App_Data path for the analytics store NOW, on the startup
+            // thread, and hand it to the Analytics engine. The analytics batch
+            // writer runs on a background thread with no HttpContext/Server.MapPath,
+            // so it must be given an absolute path up front rather than resolving
+            // one per write.
+            try { Analytics.ConfigureDataDir(Server.MapPath("~/App_Data/")); } catch { }
         }
 
         protected void Application_BeginRequest(object sender, EventArgs e)
@@ -200,6 +207,15 @@ namespace System
                 case "/api/get-article-markdown":
                     GetArticleMarkdownApi.HandleRequest(); return;
 
+                // ===== Internal Content Analytics =====
+                // Public (no auth): called by /js/analytics.js on public pages.
+                case "/api/analytics/start":
+                    AnalyticsApi.HandleStart(); return;
+                case "/api/analytics/heartbeat":
+                    AnalyticsApi.HandleHeartbeat(); return;
+                case "/api/admin/analytics":
+                    AdminAnalyticsApi.HandleRequest(); return;
+
                 // ===== Admin pages =====
                 case "/admin":
                 case "/admin/dashboard":
@@ -230,6 +246,10 @@ namespace System
                     AdminUser.HandleRequest(); return;
                 case "/admin/nav":
                     AdminNavBuilder.HandleRequest(); return;
+                case "/admin/analytics":
+                    AdminAnalytics.HandleListRequest(); return;
+                case "/admin/analytics/detail":
+                    AdminAnalytics.HandleDetailRequest(); return;
                 case "/admin/guidelines":
                     AdminGuidelines.HandleRequest(); return;
                 case "/admin/markdown-docs":

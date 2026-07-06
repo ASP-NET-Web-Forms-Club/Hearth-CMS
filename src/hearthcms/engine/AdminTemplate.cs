@@ -85,6 +85,7 @@ namespace System.engine
             {NavItem("media", "/admin/media", "fa-images", "Media")}
             {NavItem("themes", "/admin/themes", "fa-palette", "Themes")}
             {NavItem("nav", "/admin/nav", "fa-bars-staggered", "Navigation")}
+            {NavItem("analytics", "/admin/analytics", "fa-chart-line", "Analytics")}
             {NavItem("settings", "/admin/settings", "fa-sliders", "Settings")}
             {NavItem("users", "/admin/users", "fa-users", "Users")}
             {NavItem("guidelines", "/admin/guidelines", "fa-circle-info", "General Guidelines")}

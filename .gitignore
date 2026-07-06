@@ -1,6 +1,8 @@
 # === Hearth CMS — runtime & generated ===
 /src/hearthcms/App_Data/page_cache/
 /src/hearthcms/App_Data/*.sqlite
+/src/hearthcms/App_Data/hearth_analytics.sqlite-shm
+/src/hearthcms/App_Data/hearth_analytics.sqlite-wal
 /src/hearthcms/App_Data/config.txt
 cms.sqlite
 /src/hearthcms/media/

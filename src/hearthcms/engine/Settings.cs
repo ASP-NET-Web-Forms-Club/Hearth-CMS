@@ -118,6 +118,13 @@
 
         public static bool ApiTokenEnabled { get { return ApiToken.Length > 0; } }
 
+        // ----- Internal Content Analytics -----
+        // Public-page-only visit tracking, stored in its own SQLite file
+        // (App_Data/hearth_analytics.sqlite) - never the main CMS database.
+        // Default OFF: nothing is tracked, and the /js/analytics.js tag is not
+        // even emitted, until an admin opts in from the Analytics page.
+        public static bool AnalyticsEnabled { get { return Db.GetSetting("analytics_enabled", "0") == "1"; } }
+
         // ----- Active theme ----- (validated + defaulted by ThemeManager)
         public static string ActiveTheme { get { return ThemeManager.GetActiveSlug(); } }
 

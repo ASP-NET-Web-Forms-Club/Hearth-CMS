@@ -76,6 +76,10 @@ namespace System.engine.CsTemplate.Hearth
         public string RenderFooter()
         {
             string footerText = HttpUtility.HtmlEncode(Settings.FooterText);
+            // Internal Content Analytics: only emit the tag at all when the
+            // setting is on - when disabled, no script is included (not just a
+            // no-op script), so nothing about analytics reaches the page.
+            string analyticsTag = Settings.AnalyticsEnabled ? "<script src='/js/analytics.js'></script>\n" : "";
 
             return string.Format(@"
 </main>
@@ -86,10 +90,10 @@ namespace System.engine.CsTemplate.Hearth
     </div>
 </footer>
 <script src='/js/site.js'></script>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js'></script>
+{2}<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js'></script>
 <script>setTimeout(function(){{document.querySelectorAll('pre code').forEach(function(el){{try{{hljs.highlightElement(el);}}catch(e){{}}}});}},250);</script>
 </body>
-</html>", BuildFooterColumns(), footerText);
+</html>", BuildFooterColumns(), footerText, analyticsTag);
         }
 
         // The optional multi-column footer area, mirroring components/footer-column.html.

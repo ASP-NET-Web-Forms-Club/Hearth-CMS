@@ -215,6 +215,12 @@ namespace System.engine
                 + "    <meta name='description' content='" + HttpUtility.HtmlEncode(description) + "'>\n    "
                 + SiteMetaHeadTags(Title, description, OgImage);
 
+            // Internal Content Analytics: only emit the tag at all when the
+            // setting is on - when disabled, no script is included (not just a
+            // no-op script), so nothing about analytics reaches the page.
+            if (Settings.AnalyticsEnabled)
+                header += "\n    <script src='/js/analytics.js'></script>";
+
             var m = new TemplateModel();
             m.SetRaw("head_meta", header);
             m.SetText("site_name", siteName);

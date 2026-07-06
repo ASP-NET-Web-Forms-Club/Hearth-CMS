@@ -550,6 +550,10 @@
     <Compile Include="engine\RH\AdminMediaApi.cs" />
     <Compile Include="engine\RH\AdminSettings.cs" />
     <Compile Include="engine\RH\AdminSettingsApi.cs" />
+    <Compile Include="engine\Analytics.cs" />
+    <Compile Include="engine\RH\AnalyticsApi.cs" />
+    <Compile Include="engine\RH\AdminAnalytics.cs" />
+    <Compile Include="engine\RH\AdminAnalyticsApi.cs" />
     <Compile Include="engine\RH\AdminNavBuilder.cs" />
     <Compile Include="engine\RH\AdminPreviewApi.cs" />
     <Compile Include="engine\ThemeManager.cs" />
@@ -569,6 +573,7 @@
     <Content Include="css\login.css" />
     <Content Include="css\editor.css" />
     <Content Include="js\site.js" />
+    <Content Include="js\analytics.js" />
     <Content Include="js\admin.js" />
     <Content Include="js\admin-user.js" />
     <Content Include="js\AdminThemeEditor.js" />

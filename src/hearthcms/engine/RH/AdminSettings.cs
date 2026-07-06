@@ -67,6 +67,8 @@ namespace System.engine.RH
 
             bool devMode = Settings.IsDevMode;
 
+            bool analyticsEnabled = Settings.AnalyticsEnabled;
+
             string apiToken = Settings.ApiToken;
             bool apiTokenSet = apiToken.Length > 0;
 
@@ -351,6 +353,26 @@ namespace System.engine.RH
             <div style='margin-top:14px'>
                 <button type='button' class='btn btn-ghost btn-sm' onclick='clearCacheNow()'><i class='fa-solid fa-broom'></i> Clear cache now</button>
             </div>
+        </div>
+    </div>
+
+    <div class='card'>
+        <div class='card-header'><h2><i class='fa-solid fa-chart-line'></i> Internal Content Analytics</h2></div>
+        <div class='card-body'>
+            <label class='switch'>
+                <input type='checkbox' name='analytics_enabled' {(analyticsEnabled ? "checked" : "")} />
+                <span>Enable analytics</span>
+            </label>
+            <p class='form-hint' style='margin-top:10px'>
+                Tracks page views and reading time on <strong>public pages only</strong> (never admin, never login).
+                No IP addresses are ever recorded. Data is stored in its own local file
+                (<code>App_Data/hearth_analytics.sqlite</code>), separate from the main CMS database.
+                When disabled, the tracking script is not included on the site at all.
+            </p>
+            <p class='form-hint' style='margin-top:8px'>
+                View reports on the <a href='/admin/analytics'>Analytics</a> page, where you can also clear all
+                collected data.
+            </p>
         </div>
     </div>
 

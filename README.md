@@ -43,6 +43,7 @@ The architecture behind this CMS is documented in a dedicated article series:
 - **Automatic OG / social meta tags** — Open Graph and Twitter Card tags wired across every page.
 - **Automatic sitemap** — live-generated `sitemap.xml` and `robots.txt`.
 - **Custom session + Remember Me** — lock-free in-memory session available at `BeginRequest`, persistent across app-pool recycles.
+- **Built-in Simple Analytics** - Page view counts and simple page performance analytics.
 - **Operator escape hatches** — secret admin URL slug, `/reset_app` config reload without restart, one-shot admin-credential reset, and a logged additive schema-migration system.
 - **20 HTML themes ship in the box**: 18 HTML themes (Almanac, Cathode, Cipher, Corporate, Diving, DivingDark, Element, Folio, Legal, LegalDark, Mosaic, Riso, RiverCove, Solarpunk, Swiss, Valentine, ValentineLight, Victoria) plus 2 C# themes (Hearth, Broadsheet).
 

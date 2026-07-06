@@ -19,7 +19,8 @@ namespace System.engine.RH
             "cache_ram_enabled", "cache_file_enabled", "cache_ram_max_mb",
             "home_page_mode", "home_page_id",
             "date_format",
-            "dev_mode"
+            "dev_mode",
+            "analytics_enabled"
         };
 
         public static void HandleRequest()
