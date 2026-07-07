@@ -1,4 +1,4 @@
-﻿using System.engine;
+using System.engine;
 using System.engine.RH;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
@@ -34,6 +34,31 @@ namespace System.engine.CsTemplate.Broadsheet
 
         public string RenderHeader()
         {
+            try
+            {
+                var ctx = HttpContext.Current;
+                if (ctx != null && ctx.Request != null)
+                {
+                    string rawPath = ctx.Request.Path ?? "";
+                    string path = rawPath.ToLowerInvariant().TrimEnd('/');
+                    if (string.IsNullOrEmpty(path)) path = "/";
+                    if (path == "/" || path == "/home")
+                    {
+                        string siteName = Settings.SiteName;
+                        string tagline = (Settings.SiteTagline ?? "").Trim();
+                        if (!string.IsNullOrEmpty(tagline))
+                        {
+                            Title = siteName + " - " + tagline;
+                        }
+                        else
+                        {
+                            Title = siteName;
+                        }
+                    }
+                }
+            }
+            catch { }
+
             // {{head_meta}} equivalent: the page <title>, meta description,
             // the site-wide favicon, plus the full meta block (theme-color and
             // Open Graph / Twitter cards). Built by the shared, template-engine-

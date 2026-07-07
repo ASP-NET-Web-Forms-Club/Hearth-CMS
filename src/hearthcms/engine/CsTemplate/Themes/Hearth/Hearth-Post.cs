@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.engine.Markdown;
 using System.Text;
@@ -32,8 +32,7 @@ namespace System.engine.CsTemplate.Hearth
 
             var crumbs = new List<DocCrumb>
             {
-                new DocCrumb("Home", "/"),
-                new DocCrumb("Latest posts", "/latest-post")
+                new DocCrumb("Home", "/")
             };
             string asideHeading = "Keep reading";
             if (post.CategoryId > 0)

@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using System.Web;
 using System.engine;
 using System.engine.RH;
@@ -31,6 +31,31 @@ namespace System.engine.CsTemplate.Hearth
 
         public string RenderHeader()
         {
+            try
+            {
+                var ctx = HttpContext.Current;
+                if (ctx != null && ctx.Request != null)
+                {
+                    string rawPath = ctx.Request.Path ?? "";
+                    string path = rawPath.ToLowerInvariant().TrimEnd('/');
+                    if (string.IsNullOrEmpty(path)) path = "/";
+                    if (path == "/" || path == "/home")
+                    {
+                        string tagline = (Settings.SiteTagline ?? "").Trim();
+                        if (!string.IsNullOrEmpty(tagline))
+                        {
+                            Title = Settings.SiteName + " - " + tagline;
+                        }
+                        else
+                        {
+                            Title = Settings.SiteName;
+                        }
+
+                    }
+                }
+            }
+            catch { }
+
             // {{head_meta}} equivalent: the page <title>, meta description,
             // the site-wide favicon, plus the full meta block (theme-color and
             // Open Graph / Twitter cards) - the same SiteMetaHeadTags the HTML
@@ -39,8 +64,6 @@ namespace System.engine.CsTemplate.Hearth
             // already emits the favicon set, so it is not added separately here.
             string headMeta = "<title>" + Enc(Title) + "</title>\n    <meta name='description' content='" + Enc(MetaDescription) + "' />";
             headMeta += "\n    " + PublicTemplate.SiteMetaHeadTags(Title, MetaDescription, OgImage);
-
-            string siteName = Settings.SiteName;
 
             return string.Format(@"<!DOCTYPE html>
 <html lang='en'>
@@ -70,7 +93,7 @@ namespace System.engine.CsTemplate.Hearth
 </header>
 <div class='nav-overlay' id='navOverlay' onclick='toggleNav()'></div>
 <main class='site-main' id='main'>
-", headMeta, AttrEnc(AssetBaseUrl), Enc(siteName), NavMenu.RenderPublicNav(), PublicTemplate.RenderSiteLogo());
+", headMeta, AttrEnc(AssetBaseUrl), Enc(Title), NavMenu.RenderPublicNav(), PublicTemplate.RenderSiteLogo());
         }
 
         public string RenderFooter()

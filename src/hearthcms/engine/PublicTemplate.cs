@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Text;
 using System.Web;
@@ -13,6 +13,27 @@ namespace System.engine
             get
             {
                 string siteName = Settings.SiteName;
+                try
+                {
+                    var ctx = HttpContext.Current;
+                    if (ctx != null && ctx.Request != null)
+                    {
+                        string rawPath = ctx.Request.Path ?? "";
+                        string path = rawPath.ToLowerInvariant().TrimEnd('/');
+                        if (string.IsNullOrEmpty(path)) path = "/";
+                        if (path == "/" || path == "/home")
+                        {
+                            string tagline = (Settings.SiteTagline ?? "").Trim();
+                            if (!string.IsNullOrEmpty(tagline))
+                            {
+                                return siteName + " - " + tagline;
+                            }
+                            return siteName;
+                        }
+                    }
+                }
+                catch { }
+
                 if (string.IsNullOrEmpty(_title)) return siteName;
                 if (_title.Contains(siteName)) return _title;
                 return _title + " - " + siteName;
