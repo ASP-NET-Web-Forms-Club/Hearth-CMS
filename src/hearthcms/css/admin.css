@@ -503,7 +503,7 @@ a.stat-card:hover {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
-    overflow: hidden;
+    overflow-x: auto;
 }
 
 .data-table {
