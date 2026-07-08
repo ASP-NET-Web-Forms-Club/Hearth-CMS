@@ -379,3 +379,31 @@ p { margin: 0 0 1em; }
     padding:0 .3em;
     opacity:.55;
 }
+
+/* ============================================================
+   REQUIRED — View Content / View Markdown toggle (Post page)
+   Fixed markup injected by the CMS rendering engine
+   (ArticleTools.BuildContentArea) for every post, when
+   Settings -> Show Markdown button on posts is on. This
+   structure and these selectors are NOT part of this theme's
+   own templates - they come from the engine and are identical
+   on every theme. Every theme must style them here. See the
+   "Fixed CSS classes" section in the Theme Authoring Guide /
+   C# Template Guide.
+   ============================================================ */
+.md-toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
+.md-toolbar button {
+    font: inherit; font-size: .85em; padding: 6px 14px;
+    color: inherit; background: transparent;
+    border: 1px solid currentColor; border-radius: 6px;
+    cursor: pointer; opacity: .7; transition: opacity .12s;
+}
+.md-toolbar button:hover { opacity: 1; }
+#post_markdown textarea {
+    width: 100%; min-height: 60vh; box-sizing: border-box;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: .9em; line-height: 1.6;
+    color: inherit; background: transparent;
+    border: 1px solid currentColor; border-radius: 8px;
+    padding: 16px 18px; resize: vertical; opacity: .92;
+}

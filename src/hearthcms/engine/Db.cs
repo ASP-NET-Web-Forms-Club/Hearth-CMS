@@ -534,6 +534,7 @@ namespace System.engine
             SetIfMissing(s, "favicon_version", "1");
             SetIfMissing(s, "og_image_url", "");
             SetIfMissing(s, "theme_color", "");
+            SetIfMissing(s, "show_markdown_button", "1");
             SetIfMissing(s, DateDisplay.SettingKey, DateDisplay.DefaultFormat);
 
             // Custom admin login path (only when supplied; blank keeps the default).

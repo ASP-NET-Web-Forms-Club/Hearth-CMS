@@ -347,6 +347,50 @@ Rendered once per configured footer column and joined into `{{footer_column_list
 
 If you inherit any template from `hearth` but write your own CSS, keep the original class names (`doc-grid`, `row-post`, `post-card`, `cat-section`, `cat-feature`, `cat-mini`, …) or that inherited markup will be unstyled.
 
+## Fixed CSS classes — the Markdown toggle
+
+Most of a theme's CSS is entirely up to you: you write the templates, so you choose the class names. There is **one exception**. The "View Content / View Markdown" toggle on a post's content area is not part of any template file — it is markup the CMS rendering engine injects directly into `{{article_content}}` at render time (see `ArticleTools.BuildContentArea` if you're curious), because the same fixed structure has to work identically whether the post is rendered by an HTML theme or a C# theme. You cannot edit this markup from a theme, and its class/id selectors are **fixed and non-negotiable**:
+
+```html
+<div class='md-toolbar'>
+    <button type='button' onclick='showContent();'>View Content</button>
+    <button type='button' onclick='showMarkdown();'>View Markdown</button>
+</div>
+<div id='post_content'> … </div>
+<div id='post_markdown' style='display:none'><textarea readonly></textarea></div>
+```
+
+Because this structure is fixed by the engine rather than by your template, your theme's CSS must specifically target it — matching the engine's contract instead of a class name you invented yourself:
+
+| Selector | What it is |
+| --- | --- |
+| `.md-toolbar` | The row holding the two buttons. |
+| `.md-toolbar button` | The *View Content* / *View Markdown* buttons themselves. |
+| `#post_markdown textarea` | The raw-Markdown box, shown after clicking *View Markdown*. |
+
+**The engine does not ship any styling for these anymore.** Every theme — HTML or C# — must define its own CSS for these three selectors in its own stylesheet, or the buttons and textarea render with no styling at all (unstyled browser defaults) whenever *Show Markdown button on posts* is on in Settings. A baseline you can start from, and copy verbatim if you don't want to design it yourself:
+
+```css
+.md-toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
+.md-toolbar button {
+    font: inherit; font-size: .85em; padding: 6px 14px;
+    color: inherit; background: transparent;
+    border: 1px solid currentColor; border-radius: 6px;
+    cursor: pointer; opacity: .7; transition: opacity .12s;
+}
+.md-toolbar button:hover { opacity: 1; }
+#post_markdown textarea {
+    width: 100%; min-height: 60vh; box-sizing: border-box;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: .9em; line-height: 1.6;
+    color: inherit; background: transparent;
+    border: 1px solid currentColor; border-radius: 8px;
+    padding: 16px 18px; resize: vertical; opacity: .92;
+}
+```
+
+Every shipped theme (both the HTML-template themes and the C# `hearth`/`broadsheet` themes) already carries this block in its own CSS file, so it's a working example to check against — see `/assets/themes/{slug}/*.css`.
+
 ## Duplicating & deleting themes
 
 A theme is just **two folders that share the same slug** — one for the templates, one for the assets. There is no database table and no registry: the slug *is* the folder name. That makes both duplicating and deleting a theme plain folder operations on the server.

@@ -139,6 +139,21 @@ public override void HandleLatestPost()
 
 The same helpers work for any listing — pass a different `basePath` (e.g. `"/category/essays"`) and the category-scoped count/paged variants to page a category page too.
 
+## Fixed CSS classes — the Markdown toggle
+
+A C# theme has full control over the HTML it emits — with one exception. When you call `ArticleTools.BuildContentArea(content, postId)` (used by `HandlePost`/`HandlePage`, exactly like the shipped `Hearth` and `Broadsheet` themes do in `ArticleHtml`), it may wrap `content` in the "View Content / View Markdown" toggle structure. That markup is owned by the engine, not by your theme, so both C# themes and HTML themes render byte-for-byte identical structure:
+
+```html
+<div class='md-toolbar'>
+    <button type='button' onclick='showContent();'>View Content</button>
+    <button type='button' onclick='showMarkdown();'>View Markdown</button>
+</div>
+<div id='post_content'> … </div>
+<div id='post_markdown' style='display:none'><textarea readonly></textarea></div>
+```
+
+You cannot change this markup, and the class/id selectors are fixed: `.md-toolbar`, `.md-toolbar button`, `#post_markdown textarea`. Because it's the engine's contract and not something your theme defines, your theme's own CSS file must style these selectors explicitly — the engine emits no CSS for them. Without it, the toggle renders completely unstyled whenever *Show Markdown button on posts* is on in Settings. See the "Fixed CSS classes" section of the [HTML Template Guide](/admin/themes/docs) for the baseline CSS block to copy — the shipped `hearth-cs`/`broadsheet-cs` stylesheets under `/assets/themes/` already carry it as a working example.
+
 ## Complex queries — go straight to SQLite
 
 When the built-in helpers are not enough, query the database directly. Use `WithDb` so the connection is opened and disposed for you, and run parameterised SQL through `SQLiteExpress`:

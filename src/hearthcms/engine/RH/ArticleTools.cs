@@ -25,12 +25,17 @@ namespace System.engine.RH
     //   and the setting being off both fall through to the plain content - the
     //   caller's .doc-content.prose then renders exactly as it always did.
     //
-    // FIXED STRUCTURE (documented in the General Guidelines; theme CSS matches it):
+    // FIXED STRUCTURE (documented in the General Guidelines / Theme Authoring
+    // Guide / C# Template Guide; every theme's own CSS must style it):
     //   <div class='md-toolbar'> ...two buttons... </div>
     //   <div id='post_content'> ...rendered HTML... </div>
     //   <div id='post_markdown' style='display:none'><textarea readonly></textarea></div>
     //   <script>const post_id = N;</script>
     //   <script> showContent() / showMarkdown() - lazy-fetches the markdown </script>
+    //
+    // No CSS is emitted here. Styling `.md-toolbar`, `.md-toolbar button` and
+    // `#post_markdown textarea` is each theme's own responsibility, in its own
+    // stylesheet - see the "Fixed CSS classes" section of the authoring guides.
     //
     // The markdown is fetched lazily from the public, no-login endpoint
     // /api/get-article-markdown?id=N (GetArticleMarkdownApi), which both engines
@@ -50,14 +55,6 @@ namespace System.engine.RH
                 return content;
 
             var sb = new StringBuilder();
-            // Theme-adaptive fallback styling. Emitted in a CSS cascade @layer so
-            // any theme's own .md-toolbar / #post_markdown rules (which are
-            // unlayered, e.g. hearth-cs, Broadsheet-cs) ALWAYS win over it - this
-            // only prevents a raw, broken-looking default on themes that ship no
-            // styling. Uses inherit / currentColor / transparent so it adapts to
-            // light and dark themes alike. Browsers without @layer drop the block
-            // and fall back to the previous unstyled behaviour.
-            sb.Append(FallbackStyle);
             sb.Append(@"<div class='md-toolbar'>
 <button type='button' onclick='showContent();'>View Content</button>
 <button type='button' onclick='showMarkdown();'>View Markdown</button>
@@ -77,30 +74,6 @@ namespace System.engine.RH
             sb.Append(MarkdownToggleScript);
             return sb.ToString();
         }
-
-        // Theme-adaptive fallback so the fixed structure never looks broken on a
-        // theme that ships no CSS for it. In a @layer so themes override freely.
-        const string FallbackStyle = @"<style>
-@layer hearth-md-fallback {
-    .md-toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
-    .md-toolbar button {
-        font: inherit; font-size: .85em; padding: 6px 14px;
-        color: inherit; background: transparent;
-        border: 1px solid currentColor; border-radius: 6px;
-        cursor: pointer; opacity: .7; transition: opacity .12s;
-    }
-    .md-toolbar button:hover { opacity: 1; }
-    #post_markdown textarea {
-        width: 100%; min-height: 60vh; box-sizing: border-box;
-        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-        font-size: .9em; line-height: 1.6;
-        color: inherit; background: transparent;
-        border: 1px solid currentColor; border-radius: 8px;
-        padding: 16px 18px; resize: vertical; opacity: .92;
-    }
-}
-</style>
-";
 
         // Static toggle script - identical for every post. A plain (non-interpolated)
         // verbatim string, so the JS braces and the `${post_id}` template literal are

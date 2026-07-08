@@ -49,7 +49,7 @@ This block sits **inside** your theme's existing `.doc-content.prose` content wr
 | `#post_content` | The rendered-article container (shown by default). |
 | `#post_markdown textarea` | The raw-Markdown box (shown after clicking *View Markdown*). |
 
-The engine ships a small **theme-adaptive fallback** style for these elements (a full-width Markdown box and outlined buttons that follow your text colour), so the controls look acceptable on **every** theme out of the box — light or dark — even one that adds no CSS for them. That fallback lives in a CSS `@layer`, which means **any rule your own theme defines for the selectors above always wins over it** — so style them however you like and your rules take over completely. Bump your CSS cache-buster after editing. The raw Markdown itself comes from the public endpoint `/api/get-article-markdown?id={postId}` — the same source both engines use.
+**The engine ships no CSS for these anymore — styling them is every theme's own responsibility.** Because the markup is fixed by the engine rather than by your template, this is one of the few places where your theme's CSS *must* target a specific, non-negotiable selector rather than a class name of your own choosing. See the "Fixed CSS classes" section of the [HTML Template Guide](/admin/themes/docs) / [C# Template Guide](/admin/themes/docs-csharp) for the baseline CSS block — every shipped theme already carries it in its own stylesheet under `/assets/themes/{slug}/`. Skip it and the toggle renders with no styling at all. Bump your CSS cache-buster after editing. The raw Markdown itself comes from the public endpoint `/api/get-article-markdown?id={postId}` — the same source both engines use.
 
 ## Changing the admin login path
 
