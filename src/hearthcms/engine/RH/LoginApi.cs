@@ -15,6 +15,7 @@ namespace System.engine.RH
                 switch (action)
                 {
                     case "login": Login(); break;
+
                     default: ApiHelper.WriteError("Unknown action: " + action); break;
                 }
             }
@@ -62,5 +63,7 @@ namespace System.engine.RH
             if (remember) RememberMe.Issue(user.Id);
             ApiHelper.WriteSuccess("Signed in");
         }
+
+
     }
 }

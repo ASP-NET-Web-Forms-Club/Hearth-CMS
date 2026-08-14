@@ -64,6 +64,11 @@ namespace System.engine.RH
                 <input id='password' name='password' type='password' autocomplete='new-password' required placeholder='Password' />
             </div>
             <div class='form-field'>
+                <label for='email'>Admin email (optional)</label>
+                <input id='email' name='email' type='email' placeholder='email@example.com' />
+                <small style='display:block;margin-top:.35rem;color:#888'>Optional. Enables matching email sign-in from Open Auth (Google, Apple, GitHub, Microsoft).</small>
+            </div>
+            <div class='form-field'>
                 <label for='admin_path'>Admin login path</label>
                 <input id='admin_path' name='admin_path' type='text' placeholder='admin' />
                 <small style='display:block;margin-top:.35rem;color:#888'>The URL where you'll sign in, e.g. <code>/admin</code>. Letters, numbers, dashes, underscores. Leave blank for <code>admin</code>.</small>
@@ -86,6 +91,7 @@ async function doInstall(e) {
     fd.append('site_name', document.getElementById('site_name').value.trim());
     fd.append('username', document.getElementById('username').value.trim());
     fd.append('password', document.getElementById('password').value.trim());
+    fd.append('email', document.getElementById('email').value.trim());
     fd.append('admin_path', document.getElementById('admin_path').value.trim());
     try {
         var r = await fetch('/api/install', { method: 'POST', body: fd });
@@ -144,9 +150,10 @@ async function doInstall(e) {
             string username = req.Form["username"];
             string password = req.Form["password"];
             string adminPath = req.Form["admin_path"];
+            string email = req.Form["email"];
 
             string error;
-            if (!Db.RunInstall(siteName, username, password, adminPath, out error))
+            if (!Db.RunInstall(siteName, username, password, adminPath, email, out error))
             {
                 ApiHelper.WriteError(error);
                 return;

@@ -53,13 +53,13 @@ namespace System.engine.RH
                                 var p2 = new Dictionary<string, object>
                                     { { "@id", post.Id }, { "@cat", post.CategoryId }, { "@lim", asideLimit } };
                                 related = s.GetObjectList<obPost>(
-                                    "SELECT * FROM posts WHERE is_published=1 AND is_deleted=0 AND id<>@id AND category_id=@cat ORDER BY date_published DESC LIMIT @lim;", p2);
+                                    "SELECT * FROM posts WHERE is_published=1 AND is_deleted=0 AND id<>@id AND category_id=@cat ORDER BY is_pinned DESC, date_published DESC, id DESC LIMIT @lim;", p2);
                             }
                             if (related.Count == 0)
                             {
                                 var p2 = new Dictionary<string, object> { { "@id", post.Id }, { "@lim", asideLimit } };
                                 related = s.GetObjectList<obPost>(
-                                    "SELECT * FROM posts WHERE is_published=1 AND is_deleted=0 AND id<>@id ORDER BY date_published DESC LIMIT @lim;", p2);
+                                    "SELECT * FROM posts WHERE is_published=1 AND is_deleted=0 AND id<>@id ORDER BY is_pinned DESC, date_published DESC, id DESC LIMIT @lim;", p2);
                             }
                         }
                     }

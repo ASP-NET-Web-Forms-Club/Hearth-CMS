@@ -35,6 +35,7 @@ namespace System.engine
             // cookie) are not misread as token theft. See RememberMe.TryRestore.
             { 1, "ALTER TABLE user_sessions ADD COLUMN prev_validator_hash TEXT NOT NULL DEFAULT '';" },
             { 2, "ALTER TABLE user_sessions ADD COLUMN rotated_unix INTEGER NOT NULL DEFAULT 0;" },
+            { 3, "ALTER TABLE posts ADD COLUMN is_pinned INTEGER NOT NULL DEFAULT 0;" },
         };
 
         // The version a freshly-created database is stamped with: the largest key
@@ -232,7 +233,7 @@ namespace System.engine
         // message on validation failure or if the DB already exists.
         // ============================================================
         public static bool RunInstall(string siteName, string username, string password,
-            string adminPath, out string error)
+            string adminPath, string email, out string error)
         {
             error = "";
             siteName = (siteName ?? "").Trim();
@@ -285,7 +286,7 @@ namespace System.engine
                     // ----- 3..7. Schema + all seeding, in one place -----
                     CreateSchema(s);
                     SeedSettings(s, siteName, adminPath);
-                    SeedAdminUser(s, username, password);
+                    SeedAdminUser(s, username, password, email);
                     SeedStarterContent(s);
                     SeedNavigation(s);
 
@@ -454,6 +455,7 @@ namespace System.engine
                     excerpt TEXT NOT NULL DEFAULT '',
                     cover_image TEXT NOT NULL DEFAULT '',
                     is_published INTEGER NOT NULL DEFAULT 0,
+                    is_pinned INTEGER NOT NULL DEFAULT 0,
                     author_id INTEGER NOT NULL DEFAULT 0,
                     content_format TEXT NOT NULL DEFAULT 'html',
                     category_id INTEGER NOT NULL DEFAULT 0,
@@ -544,12 +546,12 @@ namespace System.engine
 
         // The first (and only) admin login. The table is empty on a fresh file;
         // DELETE is belt-and-braces.
-        static void SeedAdminUser(SQLiteExpress s, string username, string password)
+        static void SeedAdminUser(SQLiteExpress s, string username, string password, string email)
         {
             s.Execute("DELETE FROM users;");
             var u = new Dictionary<string, object>();
             u["username"] = username;
-            u["email"] = "";
+            u["email"] = (email ?? "").Trim();
             u["password_hash"] = Auth.Hash(password);
             u["display_name"] = "Administrator";
             u["role"] = "admin";

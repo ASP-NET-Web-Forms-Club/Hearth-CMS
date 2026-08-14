@@ -53,7 +53,7 @@ namespace System.engine.RH
                         var s = new SQLiteExpress(cmd);
                         var qp = new Dictionary<string, object> { { "@n", homeCount } };
                         recent = s.GetObjectList<obPost>(
-                            "SELECT * FROM posts WHERE is_published=1 AND is_deleted=0 ORDER BY date_published DESC LIMIT @n;", qp);
+                            "SELECT * FROM posts WHERE is_published=1 AND is_deleted=0 ORDER BY is_pinned DESC, date_published DESC, id DESC LIMIT @n;", qp);
                     }
                 }
             }

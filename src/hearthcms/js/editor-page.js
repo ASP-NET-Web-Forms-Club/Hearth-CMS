@@ -341,6 +341,8 @@
                             }
                         }
                     }
+                    // Save the user's preference to LocalStorage
+                    savePref(currentFormat());
                     showGoodMessage('Saved', 'Changes saved.');
                 } else {
                     showErrorMessage('Save failed', d.message);

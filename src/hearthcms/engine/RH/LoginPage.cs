@@ -36,7 +36,7 @@ namespace System.engine.RH
 <link rel='stylesheet' href='https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap'>
 <link rel='stylesheet' href='/fonts/fontawesome/css/all.min.css' />
 <link rel='stylesheet' href='/css/admin.css' />
-<link rel='stylesheet' href='/css/login.css' />
+<link rel='stylesheet' href='/css/login.css?v=3' />
 </head>
 <body class='page-login'>
 <div class='login-shell'>
@@ -69,6 +69,7 @@ namespace System.engine.RH
                 <i class='fa-solid fa-arrow-right'></i>
             </button>
         </form>
+
         <p class='login-meta'><a href='/'><i class='fa-solid fa-arrow-left'></i> Back to site</a></p>
     </div>
 </div>
@@ -103,6 +104,8 @@ async function doLogin(e) {{
     }}
     return false;
 }}
+
+
 </script>
 </body>
 </html>");

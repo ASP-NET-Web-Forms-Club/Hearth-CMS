@@ -226,7 +226,7 @@ namespace System.engine.RH
                 Slug = page.Slug,
                 Content = page.Content,
                 ContentFormat = string.IsNullOrEmpty(page.ContentFormat) ? "html" : page.ContentFormat,
-                HasStoredFormat = !string.IsNullOrEmpty(page.ContentFormat),
+                HasStoredFormat = page.Id > 0 && !string.IsNullOrEmpty(page.ContentFormat),
                 Excerpt = page.Excerpt,
                 Layout = string.IsNullOrEmpty(page.Layout) ? "stack" : page.Layout,
                 IsPublished = page.IsPublished,

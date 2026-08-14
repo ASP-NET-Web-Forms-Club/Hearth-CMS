@@ -171,7 +171,7 @@ namespace System.engine.CsTemplate
                 {
                     var p = new Dictionary<string, object> { { "@lim", totalPost } };
                     return s.GetObjectList<obPost>(
-                        "SELECT * FROM posts WHERE is_published=1 AND is_deleted=0 ORDER BY date_published DESC LIMIT @lim;", p);
+                        "SELECT * FROM posts WHERE is_published=1 AND is_deleted=0 ORDER BY is_pinned DESC, date_published DESC, id DESC LIMIT @lim;", p);
                 });
             }
             catch { return new List<obPost>(); }
@@ -186,7 +186,7 @@ namespace System.engine.CsTemplate
                 {
                     var p = new Dictionary<string, object> { { "@cat", categoryId }, { "@lim", totalPost } };
                     return s.GetObjectList<obPost>(
-                        "SELECT * FROM posts WHERE is_published=1 AND is_deleted=0 AND category_id=@cat ORDER BY date_published DESC LIMIT @lim;", p);
+                        "SELECT * FROM posts WHERE is_published=1 AND is_deleted=0 AND category_id=@cat ORDER BY is_pinned DESC, date_published DESC, id DESC LIMIT @lim;", p);
                 });
             }
             catch { return new List<obPost>(); }
@@ -210,7 +210,7 @@ namespace System.engine.CsTemplate
                         // sub inner loop: the latest posts of the category
                         var p = new Dictionary<string, object> { { "@cat", cat.Id }, { "@lim", totalPost } };
                         var posts = s.GetObjectList<obPost>(
-                            "SELECT * FROM posts WHERE is_published=1 AND is_deleted=0 AND category_id=@cat ORDER BY date_published DESC LIMIT @lim;", p);
+                            "SELECT * FROM posts WHERE is_published=1 AND is_deleted=0 AND category_id=@cat ORDER BY is_pinned DESC, date_published DESC, id DESC LIMIT @lim;", p);
                         if (posts == null || posts.Count == 0) continue;
 
                         var cp = new obCategoryPost();
@@ -335,13 +335,13 @@ namespace System.engine.CsTemplate
                         var p2 = new Dictionary<string, object>
                             { { "@id", excludePostId }, { "@cat", categoryId }, { "@lim", totalPost } };
                         related = s.GetObjectList<obPost>(
-                            "SELECT * FROM posts WHERE is_published=1 AND is_deleted=0 AND id<>@id AND category_id=@cat ORDER BY date_published DESC LIMIT @lim;", p2);
+                            "SELECT * FROM posts WHERE is_published=1 AND is_deleted=0 AND id<>@id AND category_id=@cat ORDER BY is_pinned DESC, date_published DESC, id DESC LIMIT @lim;", p2);
                     }
                     if (related == null || related.Count == 0)
                     {
                         var p2 = new Dictionary<string, object> { { "@id", excludePostId }, { "@lim", totalPost } };
                         related = s.GetObjectList<obPost>(
-                            "SELECT * FROM posts WHERE is_published=1 AND is_deleted=0 AND id<>@id ORDER BY date_published DESC LIMIT @lim;", p2);
+                            "SELECT * FROM posts WHERE is_published=1 AND is_deleted=0 AND id<>@id ORDER BY is_pinned DESC, date_published DESC, id DESC LIMIT @lim;", p2);
                     }
                     return related ?? new List<obPost>();
                 });

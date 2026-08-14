@@ -54,6 +54,7 @@ namespace System.engine.RH
             string layout = (req.Form["layout"] + "").Trim().ToLowerInvariant();
             if (layout != "split" && layout != "stack") layout = "split";   // post default
             int isPublished = (req.Form["is_published"] + "") == "1" ? 1 : 0;
+            int isPinned = (req.Form["is_pinned"] + "") == "1" ? 1 : 0;
             DateTime datePublishedExplicit = DateTime.MinValue;
             DateTime.TryParse(req.Form["date_published"] + "", out datePublishedExplicit);
 
@@ -83,6 +84,7 @@ namespace System.engine.RH
                     d["category_id"] = categoryId;
                     d["layout"] = layout;
                     d["is_published"] = isPublished;
+                    d["is_pinned"] = isPinned;
                     d["date_modified"] = DateTime.UtcNow;
 
                     // If user explicitly picked a date, honor it.

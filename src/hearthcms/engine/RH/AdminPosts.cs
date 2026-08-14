@@ -57,7 +57,7 @@ namespace System.engine.RH
 
                     lst = s.GetObjectList<obPost>(
                         "SELECT * FROM posts WHERE " + where +
-                        " ORDER BY date_published DESC, date_created DESC LIMIT @lim OFFSET @off;", prm);
+                        " ORDER BY is_pinned DESC, date_published DESC, date_created DESC LIMIT @lim OFFSET @off;", prm);
                 }
             }
 
@@ -140,6 +140,10 @@ namespace System.engine.RH
                     string statusBadge = p.IsPublished == 1
                         ? "<span class='badge badge-success'>Published</span>"
                         : "<span class='badge badge-muted'>Draft</span>";
+                    if (p.IsPinned == 1)
+                    {
+                        statusBadge += " <span class='badge badge-info'><i class='fa-solid fa-thumbtack'></i> Pinned</span>";
+                    }
 
                     string rowActions = showDeleted
                         ? $@"<button type='button' class='icon-btn' onclick='undeletePost({p.Id})' title='Restore'><i class='fa-solid fa-rotate-left'></i></button>
@@ -215,6 +219,7 @@ namespace System.engine.RH
                 ShowLayoutSelect = true,
                 ShowPublishDate = true,
                 ShowEditorTypeSelect = true,
+                ShowPinToggle = true,
 
                 ContentPlaceholder = "<p>Tell your story…</p>",
                 ExcerptPlaceholder = "Short summary shown on listings",
@@ -223,12 +228,13 @@ namespace System.engine.RH
                 Slug = post.Slug,
                 Content = post.Content,
                 ContentFormat = string.IsNullOrEmpty(post.ContentFormat) ? "html" : post.ContentFormat,
-                HasStoredFormat = !string.IsNullOrEmpty(post.ContentFormat),
+                HasStoredFormat = post.Id > 0 && !string.IsNullOrEmpty(post.ContentFormat),
                 Excerpt = post.Excerpt,
                 CoverImage = post.CoverImage,
                 CategoryId = post.CategoryId,
                 Layout = string.IsNullOrEmpty(post.Layout) ? "split" : post.Layout,
                 IsPublished = post.IsPublished,
+                IsPinned = post.IsPinned,
                 DatePublished = post.DatePublished
             };
             ContentEditor.Render(cfg);

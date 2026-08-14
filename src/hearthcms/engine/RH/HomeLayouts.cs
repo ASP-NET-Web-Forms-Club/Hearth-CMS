@@ -44,14 +44,14 @@ namespace System.engine.RH
         {
             var p = new Dictionary<string, object> { { "@lim", limit } };
             return s.GetObjectList<obPost>(
-                "SELECT * FROM posts WHERE is_published=1 AND is_deleted=0 ORDER BY date_published DESC LIMIT @lim;", p);
+                "SELECT * FROM posts WHERE is_published=1 AND is_deleted=0 ORDER BY is_pinned DESC, date_published DESC, id DESC LIMIT @lim;", p);
         }
 
         public static List<obPost> LatestInCategory(SQLiteExpress s, int categoryId, int limit)
         {
             var p = new Dictionary<string, object> { { "@cat", categoryId }, { "@lim", limit } };
             return s.GetObjectList<obPost>(
-                "SELECT * FROM posts WHERE is_published=1 AND is_deleted=0 AND category_id=@cat ORDER BY date_published DESC LIMIT @lim;", p);
+                "SELECT * FROM posts WHERE is_published=1 AND is_deleted=0 AND category_id=@cat ORDER BY is_pinned DESC, date_published DESC, id DESC LIMIT @lim;", p);
         }
 
         // Multi-key relevance search. Sort priority:
@@ -376,7 +376,7 @@ namespace System.engine.RH
         {
             var p = new Dictionary<string, object> { { "@lim", limit }, { "@off", offset } };
             return s.GetObjectList<obPost>(
-                "SELECT * FROM posts WHERE is_published=1 AND is_deleted=0 ORDER BY date_published DESC LIMIT @lim OFFSET @off;", p);
+                "SELECT * FROM posts WHERE is_published=1 AND is_deleted=0 ORDER BY is_pinned DESC, date_published DESC, id DESC LIMIT @lim OFFSET @off;", p);
         }
 
         // One page of search results: same relevance ordering as Search(), paged.

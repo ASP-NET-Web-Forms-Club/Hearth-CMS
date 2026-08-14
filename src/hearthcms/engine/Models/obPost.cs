@@ -14,6 +14,7 @@ namespace System.engine
         int category_id = 0;
         string layout = "";
         int is_published = 0;
+        int is_pinned = 0;
         int is_deleted = 0;
         int author_id = 0;
         DateTime date_created = DateTime.MinValue;
@@ -31,6 +32,7 @@ namespace System.engine
         public int CategoryId { get { return category_id; } set { category_id = value; } }
         public string Layout { get { return layout; } set { layout = value; } }
         public int IsPublished { get { return is_published; } set { is_published = value; } }
+        public int IsPinned { get { return is_pinned; } set { is_pinned = value; } }
         public int IsDeleted { get { return is_deleted; } set { is_deleted = value; } }
         public int AuthorId { get { return author_id; } set { author_id = value; } }
         public DateTime DateCreated { get { return date_created; } set { date_created = value; } }

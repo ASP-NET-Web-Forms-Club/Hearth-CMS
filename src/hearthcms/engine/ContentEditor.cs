@@ -24,6 +24,7 @@ namespace System.engine
         public bool ShowCategory = false;
         public bool ShowLayoutSelect = false;
         public bool ShowInNavToggle = false;
+        public bool ShowPinToggle = false;
         public bool ShowSortOrder = false;
         public bool ShowPublishDate = true;
         public bool ShowEditorTypeSelect = true;
@@ -47,6 +48,7 @@ namespace System.engine
         public List<obCategory> CategoryOptions = null;  // managed categories for the dropdown
         public string Layout = "";   // "split" | "stack" (resolved default by caller)
         public int IsPublished = 0;
+        public int IsPinned = 0;
         public int ShowInNav = 0;
         public int SortOrder = 0;
         public DateTime DatePublished = DateTime.MinValue;
@@ -93,6 +95,7 @@ namespace System.engine
             string contentHtml = HttpUtility.HtmlEncode(cfg.Content);
             string excerptText = HttpUtility.HtmlEncode(cfg.Excerpt);
             string publishedAttr = cfg.IsPublished == 1 ? "checked" : "";
+            string pinnedAttr = cfg.IsPinned == 1 ? "checked" : "";
             string showInNavAttr = cfg.ShowInNav == 1 ? "checked" : "";
 
             string isMarkdown = cfg.ContentFormat == "markdown" ? "markdown" : "html";
@@ -177,6 +180,14 @@ namespace System.engine
                     <span>Published</span>
                 </label>
 ");
+            if (cfg.ShowPinToggle)
+            {
+                sb.Append($@"                <label class='switch'>
+                    <input type='checkbox' name='is_pinned' {pinnedAttr} />
+                    <span>Pin Post</span>
+                </label>
+");
+            }
             if (cfg.ShowInNavToggle)
             {
                 sb.Append($@"                <label class='switch'>
