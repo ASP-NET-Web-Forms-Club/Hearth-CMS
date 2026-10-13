@@ -1,4 +1,5 @@
 # === Hearth CMS — runtime & generated ===
+PublishProfiles\
 /src/hearthcms/App_Data/page_cache/
 /src/hearthcms/App_Data/*.sqlite
 /src/hearthcms/App_Data/hearth_analytics.sqlite-shm
@@ -34,3 +35,6 @@ _ReSharper*/
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# Publish profiles
+src/hearthcms/Properties/PublishProfiles/
