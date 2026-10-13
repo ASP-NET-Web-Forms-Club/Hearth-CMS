@@ -19,8 +19,7 @@ Hearth is built by using **Pageless ASP.NET Web Forms Architecture** (PAW). Ever
 
 The architecture behind this CMS is documented in a dedicated article series:
 
-- [Introducing ASP.NET Web Forms Pageless Architecture](https://adriancs.com)
-- [True Pageless Architecture with Custom Session State](https://adriancs.com/asp-net-web-forms-true-pageless-architecture-with-custom-session-state/)
+- [Pageless ASP.NET Web Forms Architecture](https://adriancs.com/complete-architecture-reference-for-pageless-asp-net-web-forms-in-md-markdown-format)
 - [Three Approaches to ASP.NET Web Forms Architecture](https://adriancs.com/three-approaches-to-asp-net-web-forms-architecture/)
 - [Comparing Web Architectures in the .NET World](https://adriancs.com/comparing-web-architectures-in-net-world/)
 
