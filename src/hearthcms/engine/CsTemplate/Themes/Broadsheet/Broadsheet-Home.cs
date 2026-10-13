@@ -98,15 +98,17 @@ namespace System.engine.CsTemplate.Broadsheet
                 {
                     var p = recent[i];
                     string excerpt = PostExcerpt(p, 160);
+                    string pinnedCls = p.IsPinned == 1 ? " is-pinned" : "";
+                    string pinnedBadge = p.IsPinned == 1 ? "<span class='post-pinned'><i class='fa-solid fa-thumbtack'></i> Pinned</span> " : "";
 
                     sb.Append(string.Format(@"
-            <article class='post-card'>
-                <a href='/{0}' class='post-card-inner'>
-                    <h3 class='post-card-title'>{1}</h3>
-                    <p class='post-card-excerpt'>{2}</p>
-                    <span class='post-card-meta'><i class='fa-regular fa-calendar'></i> {3}</span>
+            <article class='post-card{0}'>
+                <a href='/{1}' class='post-card-inner'>
+                    <h3 class='post-card-title'>{2}</h3>
+                    <p class='post-card-excerpt'>{3}</p>
+                    <span class='post-card-meta'>{4}<i class='fa-regular fa-calendar'></i> {5}</span>
                 </a>
-            </article>", Attr(p.Slug), H(p.Title), H(excerpt), H(DateDisplay.Format(p.DatePublished))));
+            </article>", pinnedCls, Attr(p.Slug), H(p.Title), H(excerpt), pinnedBadge, H(DateDisplay.Format(p.DatePublished))));
                 }
 
                 sb.Append(@"

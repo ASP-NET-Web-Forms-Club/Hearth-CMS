@@ -95,6 +95,10 @@ namespace System.engine.RH
                     ? ToPlainText(p.Content, 160) : p.Excerpt;
                 var m = new TemplateModel();
                 m.SetAttr("post_url", "/" + p.Slug);
+                m.SetRaw("post_pinned_class", p.IsPinned == 1 ? " is-pinned" : "");
+                m.SetRaw("post_pinned", p.IsPinned == 1
+                    ? "<span class='post-pinned'><i class='fa-solid fa-thumbtack'></i> Pinned</span>"
+                    : "");
                 m.SetText("post_title", p.Title);
                 m.SetText("post_excerpt", excerpt);
                 m.SetText("post_date", DateDisplay.Format(p.DatePublished));

@@ -162,6 +162,10 @@ p { margin: 0 0 1em; }
 .idx-date { grid-column: 2; grid-row: 2; font-family: var(--label); font-size: .7rem; letter-spacing: .14em; text-transform: uppercase; color: var(--faint); white-space: nowrap; align-self: end; }
 .row-cat { font-family: var(--label); font-weight: 700; font-size: .66rem; letter-spacing: .2em; text-transform: uppercase; color: var(--accent); display: inline-flex; align-items: center; gap: 6px; }
 .row-cat i { display: none; }
+.row-pinned, .post-pinned { display: inline-flex; align-items: center; gap: 4px; font-family: var(--label); font-size: .66rem; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(--accent); background: rgba(146, 64, 14, .1); border: 1px solid rgba(146, 64, 14, .25); padding: 1px 6px; line-height: 1.4; }
+.row-pinned i, .post-pinned i { font-size: .6rem; transform: rotate(30deg); }
+.idx-row.is-pinned { border-left: 3px solid var(--accent); padding-left: 12px; }
+.entry.is-pinned { border-top: 2px solid var(--accent); }
 
 /* ===== Sections (categories overview) ===== */
 .sect { padding: 40px 0; border-top: 1px solid var(--hair); }

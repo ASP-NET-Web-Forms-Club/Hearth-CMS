@@ -150,14 +150,20 @@ namespace System.engine.RH
             foreach (var p in posts)
             {
                 string emptyCls = string.IsNullOrEmpty(p.CoverImage) ? " is-empty" : "";
+                string pinnedCls = p.IsPinned == 1 ? " is-pinned" : "";
                 sb.Append($@"
-    <article class='row-post'>
+    <article class='row-post{pinnedCls}'>
         <a class='row-link' href='/{HttpUtility.HtmlAttributeEncode(p.Slug)}'>
             <span class='row-thumb{emptyCls}'>{ThumbImg(p.CoverImage)}</span>
             <span class='row-body'>
                 <span class='row-title'>{HttpUtility.HtmlEncode(p.Title)}</span>
                 <span class='row-excerpt'>{HttpUtility.HtmlEncode(Excerpt(p, 180))}</span>
-                <span class='row-meta'>
+                <span class='row-meta'>");
+                if (p.IsPinned == 1)
+                {
+                    sb.Append("\n                    <span class='row-pinned'><i class='fa-solid fa-thumbtack'></i> Pinned</span>");
+                }
+                sb.Append($@"
                     <span class='row-date'><i class='fa-regular fa-calendar'></i> {DateDisplay.Format(p.DatePublished)}</span>");
                 string catName = CatName(p, catMap);
                 if (showCategory && catName.Length > 0)
@@ -200,6 +206,10 @@ namespace System.engine.RH
             var colB = rest.Count > mid ? rest.GetRange(mid, rest.Count - mid) : new List<obPost>();
 
             string featEmpty = string.IsNullOrEmpty(feature.CoverImage) ? " is-empty" : "";
+            string featPinnedCls = feature.IsPinned == 1 ? " is-pinned" : "";
+            string featPinnedBadge = feature.IsPinned == 1
+                ? "<span class='row-pinned'><i class='fa-solid fa-thumbtack'></i> Pinned</span> "
+                : "";
 
             var sb = new StringBuilder();
             sb.Append($@"
@@ -210,12 +220,12 @@ namespace System.engine.RH
             <a class='cat-all' href='/category/{HttpUtility.HtmlAttributeEncode(catSlug)}'>View all <i class='fa-solid fa-arrow-right'></i></a>
         </div>
         <div class='cat-grid'>
-            <article class='cat-feature'>
+            <article class='cat-feature{featPinnedCls}'>
                 <a class='cat-feature-link' href='/{HttpUtility.HtmlAttributeEncode(feature.Slug)}'>
                     <span class='cat-feature-img{featEmpty}'>{ThumbImg(feature.CoverImage)}</span>
                     <h3 class='cat-feature-title'>{HttpUtility.HtmlEncode(feature.Title)}</h3>
                     <p class='cat-feature-excerpt'>{HttpUtility.HtmlEncode(Excerpt(feature, 200))}</p>
-                    <span class='cat-feature-meta'><i class='fa-regular fa-calendar'></i> {DateDisplay.Format(feature.DatePublished)}</span>
+                    <span class='cat-feature-meta'>{featPinnedBadge}<i class='fa-regular fa-calendar'></i> {DateDisplay.Format(feature.DatePublished)}</span>
                 </a>
             </article>
             {MiniList(colA)}
@@ -266,6 +276,10 @@ namespace System.engine.RH
             {
                 var m = new TemplateModel();
                 m.SetAttr("post_url", "/" + p.Slug);
+                m.SetRaw("post_pinned_class", p.IsPinned == 1 ? " is-pinned" : "");
+                m.SetRaw("post_pinned", p.IsPinned == 1
+                    ? "<span class='row-pinned'><i class='fa-solid fa-thumbtack'></i> Pinned</span>"
+                    : "");
                 m.SetRaw("post_thumb_empty", string.IsNullOrEmpty(p.CoverImage) ? " is-empty" : "");
                 m.SetRaw("post_thumb_img", ThumbImg(p.CoverImage));
                 m.SetText("post_title", p.Title);
@@ -297,6 +311,10 @@ namespace System.engine.RH
             var m = new TemplateModel();
             m.SetText("category_title", cat.Name);
             m.SetAttr("category_url", "/category/" + catSlug);
+            m.SetRaw("feature_pinned_class", feature.IsPinned == 1 ? " is-pinned" : "");
+            m.SetRaw("feature_pinned", feature.IsPinned == 1
+                ? "<span class='row-pinned'><i class='fa-solid fa-thumbtack'></i> Pinned</span>"
+                : "");
             m.SetAttr("feature_url", "/" + feature.Slug);
             m.SetRaw("feature_thumb_empty", string.IsNullOrEmpty(feature.CoverImage) ? " is-empty" : "");
             m.SetRaw("feature_thumb_img", ThumbImg(feature.CoverImage));

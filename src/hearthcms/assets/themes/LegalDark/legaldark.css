@@ -250,6 +250,10 @@ p { margin: 0 0 1em; }
 .row-meta { display: flex; align-items: center; gap: 18px; font-family: var(--mono); font-size: .76rem; color: var(--faint); }
 .row-date { display: inline-flex; align-items: center; gap: 7px; }
 .row-cat { display: inline-flex; align-items: center; gap: 6px; color: var(--teal); }
+.row-pinned, .post-pinned { display: inline-flex; align-items: center; gap: 5px; font-family: var(--mono); font-size: .7rem; font-weight: 700; text-transform: uppercase; color: var(--teal); background: rgba(20, 184, 166, .15); border: 1px solid rgba(20, 184, 166, .35); border-radius: var(--r-sm); padding: 1px 7px; line-height: 1.4; }
+.row-pinned i, .post-pinned i { font-size: .62rem; transform: rotate(30deg); }
+.row-post.is-pinned { border-left: 3px solid var(--teal); }
+.post-card.is-pinned { border-top: 3px solid var(--teal); }
 .row-arrow { color: var(--faint); transition: color .18s, transform .18s; }
 .row-post:hover .row-arrow { color: var(--gold-lt); transform: translateX(3px); }
 

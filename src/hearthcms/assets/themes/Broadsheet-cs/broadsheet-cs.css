@@ -628,6 +628,41 @@ p {
     gap: 6px;
 }
 
+.row-pinned, .post-pinned {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .8px;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+    background: var(--accent-soft);
+    border: 1px solid rgba(42, 122, 226, .25);
+    border-radius: var(--radius-sm);
+    padding: 1px 7px;
+    line-height: 1.4;
+}
+
+.row-pinned i, .post-pinned i {
+    font-size: .62rem;
+    transform: rotate(30deg);
+}
+
+.row-post.is-pinned {
+    border-left: 3px solid var(--accent);
+    padding-left: 14px;
+}
+
+.post-card.is-pinned .post-card-inner {
+    border-top: 3px solid var(--accent);
+}
+
+.cat-feature.is-pinned {
+    border-left: 3px solid var(--accent);
+    padding-left: 14px;
+}
+
 .row-cat {
     color: var(--navy);
 }

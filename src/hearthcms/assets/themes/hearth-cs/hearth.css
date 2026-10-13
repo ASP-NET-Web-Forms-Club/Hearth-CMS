@@ -551,6 +551,41 @@ hr {
     gap: 6px;
 }
 
+.row-pinned, .post-pinned {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    color: var(--ember);
+    background: var(--ember-soft);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 1px 7px;
+    line-height: 1.4;
+}
+
+.row-pinned i, .post-pinned i {
+    font-size: .65rem;
+    transform: rotate(30deg);
+}
+
+.row-post.is-pinned {
+    border-left: 3px solid var(--ember);
+    padding-left: 14px;
+}
+
+.post-card.is-pinned {
+    border-top: 3px solid var(--ember);
+}
+
+.cat-feature.is-pinned {
+    border-left: 3px solid var(--ember);
+    padding-left: 14px;
+}
+
 .row-arrow {
     flex: 0 0 auto;
     color: var(--ink-faint);

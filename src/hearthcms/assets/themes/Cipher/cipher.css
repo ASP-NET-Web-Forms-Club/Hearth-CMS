@@ -664,6 +664,35 @@ button {
     color: var(--link);
 }
 
+.row-pinned, .post-pinned {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--green);
+    background: rgba(0, 255, 102, .1);
+    border: 1px solid rgba(0, 255, 102, .3);
+    padding: 1px 6px;
+    border-radius: 2px;
+    line-height: 1.4;
+}
+
+.row-pinned i, .post-pinned i {
+    font-size: 10px;
+    transform: rotate(30deg);
+}
+
+.log-row.is-pinned {
+    border-left: 2px solid var(--green);
+    padding-left: 10px;
+}
+
+.file-card.is-pinned {
+    border-top: 2px solid var(--green);
+}
+
     .row-cat i {
         margin-right: 4px;
     }

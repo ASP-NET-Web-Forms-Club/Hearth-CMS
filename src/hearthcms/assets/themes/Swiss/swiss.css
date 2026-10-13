@@ -175,6 +175,10 @@ body { counter-reset: sec; }
 .row-excerpt { color: var(--dim); font-size: .92rem; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
 .row-meta { display: flex; align-items: center; gap: 16px; font-family: var(--mono); font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; color: var(--faint); }
 .row-cat { color: var(--red); }
+.row-pinned, .post-pinned { display: inline-flex; align-items: center; gap: 4px; font-family: var(--mono); font-size: .68rem; font-weight: 700; text-transform: uppercase; color: var(--red); background: rgba(226, 35, 26, .1); border: 1px solid var(--red); padding: 1px 6px; line-height: 1.4; }
+.row-pinned i, .post-pinned i { font-size: .6rem; transform: rotate(30deg); }
+.row-post.is-pinned { border-left: 3px solid var(--red); padding-left: 12px; }
+.post-card.is-pinned { border-top: 3px solid var(--red); }
 .row-arrow { font-size: 1.3rem; color: var(--ink); }
 .row-post:hover .row-arrow { color: var(--red); }
 

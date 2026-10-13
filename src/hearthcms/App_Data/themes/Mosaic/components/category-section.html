@@ -5,14 +5,14 @@
             <a class='m-sec-link' href='{{category_url}}'>View all <i class='fa-solid fa-arrow-right'></i></a>
         </div>
         <div class='catsec-grid'>
-            <article class='tile feat-tile'>
+            <article class='tile feat-tile{{feature_pinned_class}}'>
                 <a class='ft-link' href='{{feature_url}}'>
                     <div class='ft-img{{feature_thumb_empty}}'>{{feature_thumb_img}}</div>
                     <span class='ft-body'>
                         <span class='pt-tag'>Featured</span>
                         <span class='ft-title'>{{feature_title}}</span>
                         <span class='ft-excerpt'>{{feature_excerpt}}</span>
-                        <span class='ft-date'><i class='fa-regular fa-calendar'></i> {{feature_date}}</span>
+                        <span class='ft-date'>{{feature_pinned}}<i class='fa-regular fa-calendar'></i> {{feature_date}}</span>
                     </span>
                 </a>
             </article>
